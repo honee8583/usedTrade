@@ -89,3 +89,7 @@
 * SpringBoot
 * MariaDB
 * Thymeleaf
+
+***
+### ** ERD **
+![img.png](img/ERD.png)
