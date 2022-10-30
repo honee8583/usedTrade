@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <style>
+        .errorMessage{
+            color: red;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('form').on('submit', function () {
+
+                var password = $(this).find('input[name=password]').val();
+                var rePassword = $(this).find('input[name=rePassword]').val();
+
+                if (password !== rePassword) {
+                    alert('비밀번호를 다시 체크해주세요.')
+                    return false;
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1> 회원가입 </h1>
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <form id="registerForm" action="register" method="post" th:object="${memberInput}">
+        <div>
+            이메일: <input type="text" th:field="*{email}" placeholder="이메일 입력"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('email')}" th:errors="*{name}">Incorrect Data</p>
+        </div>
+        <div>
+            비밀번호: <input type="password" th:field="*{password}" placeholder="비밀번호 입력"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Incorrect Data</p>
+        </div>
+        <div>
+            비밀번호확인: <input type="password" name="rePassword" placeholder="비밀번호 확인"/>
+        </div>
+        <div>
+            이름: <input type="text" th:field="*{name}" placeholder="이름 입력"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Incorrect Data</p>
+        </div>
+        <div>
+            전화번호: <input type="text" th:field="*{phone}" placeholder="전화번호 입력"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Incorrect Data</p>
+        </div>
+        <div>
+            주소: <input type="text" th:field="*{address}" placeholder="주소"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">Incorrect Data</p>
+        </div>
+        <div>
+            상세주소: <input type="text" th:field="*{addressDetail}" placeholder="상세주소"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('addressDetail')}" th:errors="*{addressDetail}">Incorrect Data</p>
+        </div>
+        <div>
+            <button type="submit">가입</button>
+        </div>
+    </form>
+
+</body>
+</html>

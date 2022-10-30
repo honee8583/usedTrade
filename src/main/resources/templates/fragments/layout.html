@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+</head>
+<body>
+
+    <div th:fragment="fragment-body-menu">
+        <div>
+            <a href="/">UsedTrade</a>
+            |
+            <a href="/member/register">회원 가입</a>
+            |
+            <a href="/member/myPage">마이페이지</a>
+            |
+            <a href="#">게시글</a>
+            |
+            <a href="#">신고글</a>
+            |
+            <a sec:authorize="isAnonymous()" href="/member/login">로그인</a>
+            <a sec:authorize="isAuthenticated()" href="/member/logout">로그아웃</a>
+            <div sec:authorize="isAuthenticated()">
+                <p sec:authentication="name"></p>
+            </div>
+        </div>
+        <hr/>
+    </div>
+
+</body>
+</html>

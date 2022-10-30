@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        #detail {
+            text-align: left;
+        }
+        table th, table td {
+            border: solid 1px #000;
+        }
+        .errorMessage {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1> 회원탈퇴 </h1>
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <table id="menu">
+        <thead>
+
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <a href="/member/myPage"> 회원정보 </a>
+                </td>
+                <td id="detail" rowspan="6">
+                    <form action="/member/withdraw" method="post">
+                        <div th:if="${result}">
+                            탈퇴에 성공하셨습니다
+                        </div>
+                        <div th:if="${error != null}">
+                            <p th:text="${error}">failed</p>
+                        </div>
+
+                        <p> 탈퇴를 진행하시려면 비밀번호를 입력해주세요. </p>
+                        <div>
+                            password: <input type="password" name="password" required/>
+                        </div>
+                        <div>
+                            <button type="submit"> 탈퇴 </button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+               <td>
+                   <a href="/member/change/password"> 비밀번호 변경 </a>
+               </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/member/withdraw"> 탈퇴 </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/member/myTradeList"> 내 게시글 </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/member/myRepliedTradeList"> 내가 댓글단 글 </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/member/myLikedTradeList"> 내가 찜한 글 </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
