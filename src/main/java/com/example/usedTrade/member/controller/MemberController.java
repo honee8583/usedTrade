@@ -1,6 +1,6 @@
 package com.example.usedTrade.member.controller;
 
-import com.example.usedTrade.ServiceResult;
+import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.UsedTradeApplication;
 import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.model.*;

@@ -1,4 +1,4 @@
-package com.example.usedTrade;
+package com.example.usedTrade.member.error;
 
 import com.example.usedTrade.member.error.MemberError;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.example.usedTrade.member.service.impl;
 
-import com.example.usedTrade.ServiceResult;
+import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.UsedTradeApplication;
 import com.example.usedTrade.member.error.MemberError;
 import com.example.usedTrade.exception.MemberEmailNotAuthenticatedException;
@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
