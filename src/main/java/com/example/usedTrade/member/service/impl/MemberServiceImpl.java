@@ -139,11 +139,6 @@ public class MemberServiceImpl implements MemberService {
             return new ServiceResult(false, MemberError.PASSWORD_NOT_MATCHED);
         }
 
-//        if (!passwordEncoder.matches(passwordInput.getOriginPassword(), member.getPassword())) {
-//            return new ServiceResult(false, MemberError.PASSWORD_NOT_MATCHED);
-//        }
-
-//        String encNewPassword = passwordEncoder.encode(passwordInput.getNewPassword());
         String encNewPassword = BCrypt.hashpw(passwordInput.getNewPassword(), BCrypt.gensalt());
         member.changePassword(encNewPassword);
         memberRepository.save(member);
