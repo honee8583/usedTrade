@@ -224,7 +224,7 @@ public class MemberController {
     @PostMapping("/member/withdraw")
     public String withdrawSubmit(Model model, Principal principal, String password) {
 
-        logger.info("### withdraw password: " + password);
+        logger.info("### passwordInput: " + password);
 
         ServiceResult result = memberService.withdraw(principal.getName(), password);
         model.addAttribute("result", result.isResult());
