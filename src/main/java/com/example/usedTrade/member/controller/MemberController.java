@@ -1,6 +1,6 @@
 package com.example.usedTrade.member.controller;
 
-import com.example.usedTrade.ServiceResult;
+import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.UsedTradeApplication;
 import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.model.*;
@@ -224,7 +224,7 @@ public class MemberController {
     @PostMapping("/member/withdraw")
     public String withdrawSubmit(Model model, Principal principal, String password) {
 
-        logger.info("### withdraw password: " + password);
+        logger.info("### passwordInput: " + password);
 
         ServiceResult result = memberService.withdraw(principal.getName(), password);
         model.addAttribute("result", result.isResult());

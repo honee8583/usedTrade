@@ -1,6 +1,6 @@
 package com.example.usedTrade.member.service;
 
-import com.example.usedTrade.ServiceResult;
+import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.model.*;
 import org.springframework.security.core.userdetails.UserDetailsService;

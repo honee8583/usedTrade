@@ -18,7 +18,6 @@ public class MailComponents {
     public boolean sendMail(String mail, String subject, String text) {
         
         boolean result = false;
-        
         MimeMessagePreparator msg = new MimeMessagePreparator() {
             @Override
             public void prepare(MimeMessage mimeMessage) throws Exception {
@@ -42,6 +41,4 @@ public class MailComponents {
         
         return result;
     }
-    
-
 }
