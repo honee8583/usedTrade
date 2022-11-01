@@ -3,8 +3,8 @@ package com.example.usedTrade.member.service.impl;
 import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.UsedTradeApplication;
 import com.example.usedTrade.member.error.MemberError;
-import com.example.usedTrade.exception.MemberEmailNotAuthenticatedException;
-import com.example.usedTrade.exception.MemberStopUserException;
+import com.example.usedTrade.member.error.exception.MemberEmailNotAuthenticatedException;
+import com.example.usedTrade.member.error.exception.MemberStopUserException;
 import com.example.usedTrade.mail.MailComponents;
 import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.entity.Member;
@@ -47,7 +47,6 @@ public class MemberServiceImpl implements MemberService {
             return new ServiceResult(false, MemberError.MEMBER_ALREADY_EXISTS);
         }
 
-//        String encPassword = passwordEncoder.encode(memberInput.getPassword());
         String encPassword = BCrypt.hashpw(memberInput.getPassword(), BCrypt.gensalt());
 
         String uuid = UUID.randomUUID().toString();
