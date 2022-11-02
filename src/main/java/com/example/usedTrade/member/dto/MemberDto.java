@@ -1,14 +1,15 @@
 package com.example.usedTrade.member.dto;
 
-import java.time.LocalDateTime;
-
 import com.example.usedTrade.member.entity.Member;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @ToString
 public class MemberDto {
@@ -19,14 +20,8 @@ public class MemberDto {
     private String address_detail;
     private String phone;
     private int trade_num;
-    private String status;
-    private boolean managerYn;
+    private boolean fromSocial;
     private LocalDateTime regDt;
-
-    // Email Auth
-    private boolean emailAuthYn;
-    private String emailAuthKey;
-    private LocalDateTime emailAuthDt;
 
     public static MemberDto entityToDto(Member member) {
         return MemberDto.builder()
@@ -37,12 +32,13 @@ public class MemberDto {
                 .address_detail(member.getAddress_detail())
                 .phone(member.getPhone())
                 .trade_num(member.getTrade_num())
-                .status(member.getStatus())
-                .managerYn(member.isManagerYn())
+                .fromSocial(member.isFromSocial())
                 .regDt(member.getRegDt())
-                .emailAuthYn(member.isEmailAuthYn())
-                .emailAuthKey(member.getEmailAuthKey())
-                .emailAuthDt(member.getEmailAuthDt())
                 .build();
+//                .status(member.getStatus())
+//                .managerYn(member.isManagerYn())
+//                .emailAuthYn(member.isEmailAuthYn())
+//                .emailAuthKey(member.getEmailAuthKey())
+//                .emailAuthDt(member.getEmailAuthDt())
     }
 }

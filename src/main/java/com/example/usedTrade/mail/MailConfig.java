@@ -1,4 +1,4 @@
-package com.example.usedTrade.config;
+package com.example.usedTrade.mail;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

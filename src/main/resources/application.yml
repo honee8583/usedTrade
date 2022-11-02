@@ -29,6 +29,9 @@ spring:
     livereload:
       enabled: true
 
+  profiles:
+    include: oauth
+
 logging:
   level:
     root: info

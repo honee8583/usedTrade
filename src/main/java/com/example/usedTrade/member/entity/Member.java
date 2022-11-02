@@ -2,9 +2,13 @@ package com.example.usedTrade.member.entity;
 
 import lombok.*;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -24,7 +28,12 @@ public class Member implements MemberStatus{
     private int trade_num;
     private String status;
     private boolean managerYn;
+    private boolean fromSocial;
     private LocalDateTime regDt;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<MemberRole> roles = new HashSet<>();
 
     // Email Auth
     private boolean emailAuthYn;
@@ -82,5 +91,9 @@ public class Member implements MemberStatus{
         this.emailAuthKey = "";
         this.resetPasswordKey = "";
         this.resetPasswordLimitDt = null;
+    }
+
+    public void addMemberRole(MemberRole memberRole) {
+        roles.add(memberRole);
     }
 }

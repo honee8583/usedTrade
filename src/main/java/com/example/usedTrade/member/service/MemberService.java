@@ -5,7 +5,7 @@ import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.model.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface MemberService extends UserDetailsService {
+public interface MemberService {
 
     /**
      * 회원가입
@@ -51,4 +51,9 @@ public interface MemberService extends UserDetailsService {
      * 회원탈퇴
      */
     ServiceResult withdraw(String email, String password);
+
+    /**
+     * 소셜간편로그인, 일반로그인 여부
+     */
+    boolean getFromSocial(String email);
 }

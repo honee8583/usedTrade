@@ -22,6 +22,7 @@
             |
             <a sec:authorize="isAnonymous()" href="/member/login">로그인</a>
             <a sec:authorize="isAuthenticated()" href="/member/logout">로그아웃</a>
+
             <div sec:authorize="isAuthenticated()">
                 <p sec:authentication="name"></p>
             </div>

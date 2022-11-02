@@ -1,4 +1,4 @@
-package com.example.usedTrade.config;
+package com.example.usedTrade.security.config;
 
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;

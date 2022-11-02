@@ -1,5 +1,6 @@
 package com.example.usedTrade.member.service.impl;
 
+import com.example.usedTrade.member.entity.MemberRole;
 import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.UsedTradeApplication;
 import com.example.usedTrade.member.error.MemberError;
@@ -21,6 +22,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -65,6 +70,7 @@ public class MemberServiceImpl implements MemberService {
                 .status(Member.MEMBER_STATUS_REQ)
                 .regDt(LocalDateTime.now())
                 .build();
+        member.addMemberRole(MemberRole.USER);
         memberRepository.save(member);
 
         String email = memberInput.getEmail();
@@ -237,8 +243,10 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = optionalMember.get();
-        if (!BCrypt.checkpw(password, member.getPassword())) {
-            return new ServiceResult(false, MemberError.PASSWORD_NOT_MATCHED);
+        if (!member.isFromSocial()) {
+            if (!BCrypt.checkpw(password, member.getPassword())) {
+                return new ServiceResult(false, MemberError.PASSWORD_NOT_MATCHED);
+            }
         }
 
         member.withdrawMember();
@@ -248,33 +256,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Member> optionalMember = memberRepository.findById(username);
+    public boolean getFromSocial(String email) {
+        Optional<Member> optionalMember = memberRepository.findById(email);
         if (!optionalMember.isPresent()) {
             throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
         }
 
-        Member member = optionalMember.get();
-
-        if (Member.MEMBER_STATUS_REQ.equals(member.getStatus())) {
-            throw new MemberEmailNotAuthenticatedException("이메일 인증이 안된 계정입니다.");
-        }
-
-        if (Member.MEMBER_STATUS_STOPPED.equals(member.getStatus())) {
-            throw new MemberStopUserException("정지된 회원입니다.");
-        }
-
-        if (Member.MEMBER_STATUS_WITHDRAW.equals(member.getStatus())) {
-            throw new MemberStopUserException("탈퇴된 회원입니다.");
-        }
-
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-
-//        if (member.isAdminYn()) {
-//            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-//        }
-
-        return new User(member.getEmail(), member.getPassword(), grantedAuthorities);
+        return optionalMember.get().isFromSocial();
     }
 }

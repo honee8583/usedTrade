@@ -34,45 +34,50 @@
                     <a href="/member/myPage"> 회원정보 </a>
                 </td>
                 <td id="detail" rowspan="6">
-                    <form action="/member/update" method="post" th:object="${changeMemberInput}">
-                        <div th:if="${result}">
-                            회원정보 변경에 성공하였습니다
-                        </div>
-                        <div th:if="${result eq false}">
-                            <p th:text="${error}">failed</p>
-                        </div>
-                        <div>
-                            email: <input type="email" name="email" th:value="${memberDto.email}" readonly/>
-                        </div>
-                        <div>
-                            name: <input type="text" th:id="name" th:name="name" th:value="${memberDto.name}"
-                                         placeholder="새 이름 입력"/>
-                            <p class="errorMessage" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Incorrect Data</p>
-                        </div>
-                        <div>
-                            address: <input type="text" th:id="address" th:name="address" th:value="${memberDto.address}"
-                                            placeholder="새 주소 입력"/>
-                            <p class="errorMessage" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">Incorrect Data</p>
-                        </div>
-                        <div>
-                            address detail: <input type="text" th:id="addressDetail" th:name="addressDetail"
-                                                   th:value="${memberDto.address_detail}"
-                                                   placeholder="새 상세주소 입력"/>
-                            <p class="errorMessage" th:if="${#fields.hasErrors('addressDetail')}" th:errors="*{addressDetail}">Incorrect
-                                Data</p>
-                        </div>
-                        <div>
-                            phone: <input type="text" th:id="phone" th:name="phone" th:value="${memberDto.phone}"
-                                          placeholder="새 전화번호 입력"/>
-                            <p class="errorMessage" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Incorrect Data</p>
-                        </div>
-                        <div>
-                            trade num: <input type="text" name="tradeNum" th:value="${memberDto.trade_num}" readonly/>
-                        </div>
-                        <div>
-                            <button type="submit"> 변경</button>
-                        </div>
-                    </form>
+                    <th:block th:if="${memberDto.fromSocial eq false}">
+                        <form action="/member/update" method="post" th:object="${changeMemberInput}">
+                            <div th:if="${result}">
+                                회원정보 변경에 성공하였습니다
+                            </div>
+                            <div th:if="${result eq false}">
+                                <p th:text="${error}">failed</p>
+                            </div>
+                            <div>
+                                email: <input type="email" name="email" th:value="${memberDto.email}" readonly/>
+                            </div>
+                            <div>
+                                name: <input type="text" th:id="name" th:name="name" th:value="${memberDto.name}"
+                                             placeholder="새 이름 입력"/>
+                                <p class="errorMessage" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Incorrect Data</p>
+                            </div>
+                            <div>
+                                address: <input type="text" th:id="address" th:name="address" th:value="${memberDto.address}"
+                                                placeholder="새 주소 입력"/>
+                                <p class="errorMessage" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">Incorrect Data</p>
+                            </div>
+                            <div>
+                                address detail: <input type="text" th:id="addressDetail" th:name="addressDetail"
+                                                       th:value="${memberDto.address_detail}"
+                                                       placeholder="새 상세주소 입력"/>
+                                <p class="errorMessage" th:if="${#fields.hasErrors('addressDetail')}" th:errors="*{addressDetail}">Incorrect
+                                    Data</p>
+                            </div>
+                            <div>
+                                phone: <input type="text" th:id="phone" th:name="phone" th:value="${memberDto.phone}"
+                                              placeholder="새 전화번호 입력"/>
+                                <p class="errorMessage" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Incorrect Data</p>
+                            </div>
+                            <div>
+                                trade num: <input type="text" name="tradeNum" th:value="${memberDto.trade_num}" readonly/>
+                            </div>
+                            <div>
+                                <button type="submit"> 변경</button>
+                            </div>
+                        </form>
+                    </th:block>
+                    <th:block th:if="${memberDto.fromSocial}">
+                        <p>간편 로그인한 상태입니다.</p>
+                    </th:block>
                 </td>
             </tr>
             <tr>
