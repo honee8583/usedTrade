@@ -85,7 +85,6 @@ public class MemberOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 .phone("Social Member")
                 .trade_num(0)
                 .status(Member.MEMBER_STATUS_AVAILABLE)
-                .managerYn(false)
                 .fromSocial(true)
                 .regDt(LocalDateTime.now())
                 .build();

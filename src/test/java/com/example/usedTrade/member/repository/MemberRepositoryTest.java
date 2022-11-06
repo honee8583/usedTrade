@@ -3,14 +3,16 @@ package com.example.usedTrade.member.repository;
 import com.example.usedTrade.member.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@DataJpaTest
 class MemberRepositoryTest {
 
     @Autowired
@@ -27,11 +29,10 @@ class MemberRepositoryTest {
                 .trade_num(0)
                 .regDt(LocalDateTime.now())
                 .status(Member.MEMBER_STATUS_REQ)
-                .managerYn(false)
                 .emailAuthKey(UUID.randomUUID().toString())
                 .emailAuthYn(false)
                 .emailAuthDt(LocalDateTime.now().plusDays(1))
-                .resetPasswordKey("")
+                .resetPasswordKey(UUID.randomUUID().toString())
                 .resetPasswordLimitDt(LocalDateTime.now().plusDays(1))
                 .build();
     }
@@ -54,7 +55,6 @@ class MemberRepositoryTest {
         assertEquals(testMember.getTrade_num(), savedMember.getTrade_num());
         assertEquals(testMember.getRegDt(), savedMember.getRegDt());
         assertEquals(testMember.getStatus(), savedMember.getStatus());
-        assertEquals(testMember.isManagerYn(), savedMember.isManagerYn());
         assertEquals(testMember.getEmailAuthKey(), savedMember.getEmailAuthKey());
         assertEquals(testMember.getEmailAuthDt(), savedMember.getEmailAuthDt());
         assertEquals(testMember.isEmailAuthYn(), savedMember.isEmailAuthYn());
@@ -62,4 +62,46 @@ class MemberRepositoryTest {
         assertEquals(testMember.getResetPasswordLimitDt(), savedMember.getResetPasswordLimitDt());
     }
 
+    @Test
+    void testFindByEmailAuth() {
+        // given
+        Member member = createMember();
+        String emailAuthKey = member.getEmailAuthKey();
+
+        // when
+        memberRepository.save(member);
+        Optional<Member> optionalMember = memberRepository.findByEmailAuthKey(emailAuthKey);
+
+        // then
+        assertTrue(optionalMember.isPresent());
+    }
+
+    @Test
+    void testFindByEmailAndName() {
+        // given
+        Member member = createMember();
+        String email = member.getEmail();
+        String name = member.getName();
+
+        // when
+        memberRepository.save(member);
+        Optional<Member> optionalMember = memberRepository.findByEmailAndName(email, name);
+
+        // then
+        assertTrue(optionalMember.isPresent());
+    }
+
+    @Test
+    void testFindByResetPasswordKey() {
+        // given
+        Member member = createMember();
+        String resetPasswordKey = member.getResetPasswordKey();
+
+        // when
+        memberRepository.save(member);
+        Optional<Member> optionalMember = memberRepository.findByResetPasswordKey(resetPasswordKey);
+
+        // then
+        assertTrue(optionalMember.isPresent());
+    }
 }

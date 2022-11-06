@@ -5,6 +5,7 @@ import com.example.usedTrade.security.service.MemberOAuth2UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,6 +16,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberOAuth2UserDetailsService oAuth2UserDetailsService;
@@ -42,7 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/member/reset/**",
                         "/h2-console"
                 )
-                .permitAll();
+                .permitAll()
+                .antMatchers("/trade/**").hasRole("USER");
 
         http.formLogin()
                 .loginPage("/member/login")
@@ -50,11 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/")
                 .permitAll();
 
-        http.oauth2Login()
-                    .userInfoEndpoint()
-                    .userService(oAuth2UserDetailsService)
-                .and()
-                    .defaultSuccessUrl("/");
+        http.oauth2Login().defaultSuccessUrl("/");
 
 
         http.logout()

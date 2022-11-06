@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <style>
+        .errorMessage {
+            color: red;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('#registerBtn').click(function() {
+
+                // // email, title, content, price, tradeStatus, keyword
+                var tradeInput = {
+                    title: $('#title').val(),
+                    content: $('#content').val(),
+                    price: $('#price').val(),
+                    tradeStatus: $('#tradeStatus').val(),
+                    keyword: "생활용품"
+                }
+
+                console.log(tradeInput);
+
+                $.ajax({
+                    url: '/api/trade/register',
+                    method: 'post',
+                    data: JSON.stringify(tradeInput),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                }).done(function(data) {
+                    console.log(data);
+                    // window.location.href = "/";
+                    alert('글이 등록되었습니다.');
+                }).fail(function(error) {
+                    console.log(error.responseJSON);
+
+                    alert("게시글 작성에 실패하였습니다.\n" + error.responseJSON.err);
+                });
+
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <h1> 거래글 작성 </h1>
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <form id="registerForm" action="/api/trade/register" method="post" th:object="${tradeInput}">
+        <div>
+            제목: <input type="text" th:field="*{title}" placeholder="제목 입력"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Incorrect Data</p>
+        </div>
+        <div>
+            내용: <textarea th:field="*{content}" placeholder="요약문구 입력"></textarea>
+            <p class="errorMessage" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">Incorrect Data</p>
+        </div>
+        <div>
+            가격: <input type="text" th:field="*{price}" placeholder="비밀번호 확인"/>
+            <p class="errorMessage" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Incorrect Data</p>
+        </div>
+        <!--
+        <div>
+            <select name="keywordName">
+                <option value="">키워드 선택</option>
+                <option th:each="keyword: ${keywordList}" th:value="${keyword}" th:text="${keyword}"></option>
+            </select>
+        </div>
+        -->
+        <div>
+            <select th:field="*{tradeStatus}">
+                <option value="">거래 여부</option>
+                <option th:value="SELL">판매</option>
+                <option th:value="BUY">구매</option>
+            </select>
+            <p class="errorMessage" th:if="${#fields.hasErrors('tradeStatus')}" th:errors="*{tradeStatus}">Incorrect Data</p>
+        </div>
+
+        <div>
+            <button type="button" id="registerBtn"> 작성 </button>
+        </div>
+    </form>
+
+</body>
+</html>

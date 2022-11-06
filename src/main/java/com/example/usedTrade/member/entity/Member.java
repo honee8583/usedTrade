@@ -27,7 +27,6 @@ public class Member implements MemberStatus{
     private String phone;
     private int trade_num;
     private String status;
-    private boolean managerYn;
     private boolean fromSocial;
     private LocalDateTime regDt;
 
