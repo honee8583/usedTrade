@@ -87,6 +87,8 @@ public class MemberController {
     @GetMapping("/member/myPage")
     public String myPage(Model model, Principal principal) {
 
+        logger.info("### principal: " + principal.toString());
+
         MemberDto memberDto = memberService.getInfo(principal.getName());
         logger.info("### MemberDto : " + memberDto);
         model.addAttribute("memberDto", memberDto);
@@ -124,7 +126,11 @@ public class MemberController {
     }
 
     @GetMapping("/member/change/password")
-    public String changePassword() {
+    public String changePassword(Model model, Principal principal) {
+
+        logger.info("### logined email: " + principal.getName());
+        boolean fromSocial = memberService.getFromSocial(principal.getName());
+        model.addAttribute("fromSocial", fromSocial);
 
         return "member/change_password";
     }
@@ -217,22 +223,26 @@ public class MemberController {
     }
 
     @GetMapping("/member/withdraw")
-    public String withdraw() {
+    public String withdraw(Model model, Principal principal) {
+
+        logger.info("### logined email: " + principal.getName());
+        boolean fromSocial = memberService.getFromSocial(principal.getName());
+        model.addAttribute("fromSocial", fromSocial);
+
         return "member/withdraw";
     }
 
     @PostMapping("/member/withdraw")
     public String withdrawSubmit(Model model, Principal principal, String password) {
 
-        logger.info("### passwordInput: " + password);
+        logger.info("### password: " + password);
 
         ServiceResult result = memberService.withdraw(principal.getName(), password);
-        model.addAttribute("result", result.isResult());
         if (!result.isResult()) {
             model.addAttribute("error", result.getErrorCode().getDescription());
             return "member/withdraw";
         }
 
-        return "/index";
+        return "redirect:/member/logout";
     }
 }

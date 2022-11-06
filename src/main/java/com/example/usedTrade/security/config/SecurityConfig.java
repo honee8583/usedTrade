@@ -1,6 +1,7 @@
-package com.example.usedTrade.config;
+package com.example.usedTrade.security.config;
 
 
+import com.example.usedTrade.security.service.MemberOAuth2UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final MemberOAuth2UserDetailsService oAuth2UserDetailsService;
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
@@ -46,6 +49,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler(getFailureHandler())   // 로그인 실패 케이스
                 .defaultSuccessUrl("/")
                 .permitAll();
+
+        http.oauth2Login()
+                    .userInfoEndpoint()
+                    .userService(oAuth2UserDetailsService)
+                .and()
+                    .defaultSuccessUrl("/");
+
 
         http.logout()
                 .logoutRequestMatcher(

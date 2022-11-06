@@ -34,22 +34,27 @@
                     <a href="/member/myPage"> 회원정보 </a>
                 </td>
                 <td id="detail" rowspan="6">
-                    <form action="/member/withdraw" method="post">
-                        <div th:if="${result}">
-                            탈퇴에 성공하셨습니다
-                        </div>
-                        <div th:if="${error != null}">
-                            <p th:text="${error}">failed</p>
-                        </div>
+                    <th:block th:if="${fromSocial eq false}">
+                        <form action="/member/withdraw" method="post">
+                            <div th:if="${error != null}">
+                                <p th:text="${error}">failed</p>
+                            </div>
 
-                        <p> 탈퇴를 진행하시려면 비밀번호를 입력해주세요. </p>
-                        <div>
-                            password: <input type="password" name="password" required/>
-                        </div>
-                        <div>
-                            <button type="submit"> 탈퇴 </button>
-                        </div>
-                    </form>
+                            <p> 탈퇴를 진행하시려면 비밀번호를 입력해주세요. </p>
+                            <div>
+                                password: <input type="password" name="password" required/>
+                            </div>
+                            <div>
+                                <button type="submit"> 탈퇴 </button>
+                            </div>
+                        </form>
+                    </th:block>
+                    <th:block th:if="${fromSocial}">
+                        <p>간편 로그인한 상태입니다.</p>
+                        <form action="/member/withdraw" method="post">
+                            <button type="submit">탈퇴</button>
+                        </form>
+                    </th:block>
                 </td>
             </tr>
             <tr>
