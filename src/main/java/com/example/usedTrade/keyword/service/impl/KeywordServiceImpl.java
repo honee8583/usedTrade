@@ -32,7 +32,9 @@ public class KeywordServiceImpl implements KeywordService {
             throw new KeywordAlreadyExistsException();
         }
 
-        Keyword keyword = Keyword.builder().keywordName(keywordInput.getKeywordName()).build();
+        Keyword keyword = Keyword.builder()
+                            .keywordName(keywordInput.getKeywordName())
+                            .build();
 
         keywordRepository.save(keyword);
     }

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,6 +23,7 @@ public class ApiKeywordController {
     private final KeywordService keywordService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createKeyword(@RequestBody @Valid KeywordInput keywordInput) {
         log.info("create keyword: " + keywordInput);
 
@@ -30,6 +33,7 @@ public class ApiKeywordController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<KeywordDto> getKeyword(@PathVariable long id) {
         log.info("get keyword: " + id);
 
@@ -39,6 +43,7 @@ public class ApiKeywordController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<KeywordDto>> getKeywordList() {
         log.info("get keyword list");
 
@@ -48,6 +53,7 @@ public class ApiKeywordController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateKeyword(@PathVariable long id,
                                            @RequestBody @Valid KeywordInput keywordInput) {
         log.info("update keyword: " + id);
@@ -58,6 +64,7 @@ public class ApiKeywordController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteKeyword(@PathVariable long id) {
         log.info("delete keyword: " + id);
 

@@ -14,15 +14,48 @@
     <script>
         $(document).ready(function () {
 
+            // 키워드 리스트 불러오기
+            $.ajax({
+                url: "/api/keyword",
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function(keywordList) {
+                    console.log("getKeywordList");
+                    console.log(keywordList);
+
+                    var str = "";
+                    $.each(keywordList, function (index, keyword) {
+                        str += "<label><input type='checkbox' name='keyword' value='" + keyword.keywordName + "'/>" + keyword.keywordName + "</label>";
+                    });
+
+                    $('#keywordListDiv').html(str);
+
+                },error: function(error) {
+                    alert("키워드를 불러오는데 실패했습니다.");
+                    console.log(error.responseJSON);
+                }
+            });
+
+            // 게시글 등록 버튼
             $('#registerBtn').click(function() {
 
-                // title, content, price, tradeStatus, keyword
+                var keywordList = [];
+                $('input:checkbox[name="keyword"]').each(function() {
+                    if(this.checked){
+                        keywordList.push(this.value)
+                    }
+                });
+
+                console.log(keywordList);
+
+                // title, content, price, tradeStatus, keywordList
                 var tradeInput = {
                     title: $('#title').val(),
                     content: $('#content').val(),
                     price: $('#price').val(),
                     tradeStatus: $('#tradeStatus').val(),
-                    keywordList: ["생활용품", "전자기기"]
+                    keywordList: keywordList
                 }
 
                 console.log(tradeInput);
@@ -35,6 +68,7 @@
                     dataType: 'json',
                 }).done(function(data) {
                     alert('글이 등록되었습니다.');
+                    window.location.href = "/trade/list";
                     console.log(data);
                 }).fail(function(error) {
                     alert("게시글 작성에 실패하였습니다.");
@@ -65,12 +99,9 @@
             <p class="errorMessage" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Incorrect Data</p>
         </div>
 
-<!--        <div>-->
-<!--            <select name="keywordName">-->
-<!--                <option value="">키워드 선택</option>-->
-<!--                <option th:each="keyword: ${keywordList}" th:value="${keyword}" th:text="${keyword}"></option>-->
-<!--            </select>-->
-<!--        </div>-->
+        <div id="keywordListDiv">
+
+        </div>
 
         <div>
             <select th:field="*{tradeStatus}">

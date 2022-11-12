@@ -29,7 +29,6 @@ public class Trade {
     @Enumerated(EnumType.STRING)
     private TradeStatus tradeStatus;
 
-    // TODO
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private Set<String> keywordList = new HashSet<>();

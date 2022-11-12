@@ -50,11 +50,6 @@ class KeywordServiceTest {
         // given
         KeywordInput keywordInput = createKeywordInput();
 
-        Keyword keyword = createKeyword();
-
-        given(keywordRepository.findByKeywordName(anyString()))
-                .willReturn(Optional.of(keyword));
-
         // when
         keywordService.create(keywordInput);
 

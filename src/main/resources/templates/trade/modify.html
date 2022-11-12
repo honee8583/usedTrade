@@ -17,6 +17,29 @@
             const searchParams = new URLSearchParams(location.search);
             var tradeId = searchParams.get("tradeId");
 
+            // 키워드 리스트 불러오기
+            $.ajax({
+                url: "/api/keyword",
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function(keywordList) {
+                    console.log(keywordList);
+
+                    var str = "";
+                    $.each(keywordList, function (index, keyword) {
+                        str += "<label><input type='checkbox' name='keyword' value='" + keyword.keywordName
+                            + "'/>" + keyword.keywordName + "</label>";
+                    });
+
+                    $('#keywordListDiv').html(str);
+
+                },error: function(error) {
+                    alert("키워드를 불러오는데 실패했습니다.");
+                    console.log(error.responseJSON);
+                }
+            });
+
             // 수정할 데이터 불러오기
             $.ajax({
                 url: '/api/trade/' + tradeId,
@@ -29,6 +52,11 @@
                     $("input[name='title']").attr("value", tradeDto.title);
                     $("input[name='price']").attr("value", tradeDto.price);
                     $("#content").html(tradeDto.content);
+
+                    $.each(tradeDto.keywordList, function(index_k, keyword) {   // 가져온 키워드
+                        $("input:checkbox[value='" + keyword + "']").attr("checked", true);
+                    });
+
                     $("#tradeStatus").val(tradeDto.tradeStatus).prop("selected", true);
 
                 },
@@ -41,13 +69,20 @@
             // 수정버튼
             $('#modifyBtn').click(function() {
 
+                var keywordList = [];
+                $('input:checkbox[name="keyword"]').each(function() {
+                    if(this.checked){
+                        keywordList.push(this.value)
+                    }
+                });
+
                 // title, content, price, tradeStatus, keyword
                 var tradeInput = {
                     title: $('#title').val(),
                     content: $('#content').val(),
                     price: $('#price').val(),
                     tradeStatus: $('#tradeStatus').val(),
-                    keywordList: ["생활용품"]
+                    keywordList: keywordList
                 }
 
                 console.log(tradeInput);
@@ -87,14 +122,9 @@
         <div>
             가격: <input type="text" id="price" name="price" value="" placeholder="가격 입력"/>
         </div>
-        <!--
-        <div>
-            <select name="keywordName">
-                <option value="">키워드 선택</option>
-                <option th:each="keyword: ${keywordList}" th:value="${keyword}" th:text="${keyword}"></option>
-            </select>
+        <div id="keywordListDiv">
+
         </div>
-        -->
         <div>
             <select name="tradeStatus" id="tradeStatus">
                 <option value="">거래 여부</option>
