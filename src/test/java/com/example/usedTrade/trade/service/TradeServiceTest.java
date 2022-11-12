@@ -1,7 +1,8 @@
 package com.example.usedTrade.trade.service;
 
+import com.example.usedTrade.keyword.entity.Keyword;
+import com.example.usedTrade.keyword.repository.KeywordRepository;
 import com.example.usedTrade.member.entity.Member;
-import com.example.usedTrade.member.repository.MemberRepository;
 import com.example.usedTrade.trade.entity.Trade;
 import com.example.usedTrade.trade.entity.TradeStatus;
 import com.example.usedTrade.trade.model.TradeDto;
@@ -13,27 +14,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.BDDMockito.given;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
-@Transactional
 @ExtendWith(MockitoExtension.class)
 class TradeServiceTest {
 
     @Mock
     TradeRepository tradeRepository;
+
+    @Mock
+    KeywordRepository keywordRepository;
 
     @InjectMocks
     TradeServiceImpl tradeService;
@@ -41,16 +37,28 @@ class TradeServiceTest {
     @Test
     void testRegister() {
         // given
+        List<String> keywordList = Arrays.asList("생활용품", "전자기기");
         TradeInput tradeInput = TradeInput.builder()
                 .title("title")
                 .content("content")
                 .price(1000)
                 .tradeStatus("SELL")
-                .keyword("생활용품")
+                .keywordList(keywordList)
                 .build();
+
+        Keyword keyword1 = Keyword.builder().keywordName("생활용품").build();
+        Keyword keyword2 = Keyword.builder().keywordName("전자기기").build();
+
+        keywordRepository.save(keyword1);
+        keywordRepository.save(keyword2);
+
+        given(keywordRepository.findByKeywordName(anyString())).willReturn(Optional.of(keyword1));
+        given(keywordRepository.findByKeywordName(anyString())).willReturn(Optional.of(keyword2));
 
         // when
         tradeService.register(tradeInput);
+        keywordRepository.findByKeywordName("생활용품");
+        keywordRepository.findByKeywordName("전자기기");
 
         // then
         verify(tradeRepository).save(any());
@@ -59,28 +67,36 @@ class TradeServiceTest {
     @Test
     void testModify() {
         // given
+        List<String> keywordList = Arrays.asList("생활용품", "전자기기");
         TradeInput modifyInput = TradeInput.builder()
                 .title("title2")
                 .content("content2")
-                .price(10000)
-                .tradeStatus("BUY")
-                .keyword("가전기기")
+                .price(1000)
+                .tradeStatus("SELL")
+                .keywordList(keywordList)
                 .build();
 
+
+        Set<String> keywordSet = new HashSet<>();
+        keywordSet.add("생활용품");
+        keywordSet.add("전자기기");
         Trade trade = Trade.builder()
                 .id(2L)
                 .title("title")
                 .content("content")
                 .price(1000)
                 .tradeStatus(TradeStatus.valueOf("SELL"))
-                .keyword("생활용품")
+                .keywordList(keywordSet)
                 .build();
+
+        keywordRepository.save(Keyword.builder().keywordName("생활용품").build());
+        keywordRepository.save(Keyword.builder().keywordName("전자기기").build());
 
         given(tradeRepository.findById(anyLong()))
                 .willReturn(Optional.of(trade));
 
         // when
-        tradeService.modify(modifyInput);
+        tradeService.modify(2L, modifyInput);
         Optional<Trade> optionalTrade = tradeRepository.findById(2L);
 
         // then
@@ -91,14 +107,20 @@ class TradeServiceTest {
     @Test
     void testDelete() {
         // given
+        Set<String> keywordSet = new HashSet<>();
+        keywordSet.add("생활용품");
+        keywordSet.add("전자기기");
         Trade trade = Trade.builder()
                 .id(2L)
                 .title("title")
                 .content("content")
                 .price(1000)
                 .tradeStatus(TradeStatus.valueOf("SELL"))
-                .keyword("생활용품")
+                .keywordList(keywordSet)
                 .build();
+
+        keywordRepository.save(Keyword.builder().keywordName("생활용품").build());
+        keywordRepository.save(Keyword.builder().keywordName("전자기기").build());
 
         given(tradeRepository.findById(anyLong()))
                 .willReturn(Optional.of(trade));
@@ -113,15 +135,21 @@ class TradeServiceTest {
     @Test
     void testGetTrade() {
         // given
+        Set<String> keywordSet = new HashSet<>();
+        keywordSet.add("생활용품");
+        keywordSet.add("전자기기");
         Trade trade = Trade.builder()
                 .id(2L)
-                .member(Member.builder().email("test").build())
                 .title("title")
+                .member(Member.builder().email("test@test.com").build())
                 .content("content")
                 .price(1000)
                 .tradeStatus(TradeStatus.valueOf("SELL"))
-                .keyword("생활용품")
+                .keywordList(keywordSet)
                 .build();
+
+        keywordRepository.save(Keyword.builder().keywordName("생활용품").build());
+        keywordRepository.save(Keyword.builder().keywordName("전자기기").build());
 
         given(tradeRepository.findById(anyLong()))
                 .willReturn(Optional.of(trade));
@@ -135,21 +163,28 @@ class TradeServiceTest {
         assertEquals("content", tradeDto.getContent());
         assertEquals(1000, tradeDto.getPrice());
         assertEquals(TradeStatus.SELL, tradeDto.getTradeStatus());
-        assertEquals("생활용품", tradeDto.getKeyword());
+        assertTrue(tradeDto.getKeywordList().contains("생활용품"));
+        assertTrue(tradeDto.getKeywordList().contains("전자기기"));
     }
 
     @Test
     void testGetTradeList() {
         // given
+        Set<String> keywordSet = new HashSet<>();
+        keywordSet.add("생활용품");
+        keywordSet.add("전자기기");
         Trade trade = Trade.builder()
                 .id(2L)
-                .member(Member.builder().email("test").build())
+                .member(Member.builder().email("test@test.com").build())
                 .title("title")
                 .content("content")
                 .price(1000)
                 .tradeStatus(TradeStatus.valueOf("SELL"))
-                .keyword("생활용품")
+                .keywordList(keywordSet)
                 .build();
+
+        keywordRepository.save(Keyword.builder().keywordName("생활용품").build());
+        keywordRepository.save(Keyword.builder().keywordName("전자기기").build());
 
         Trade trade2 = Trade.builder()
                 .id(3L)
@@ -158,7 +193,7 @@ class TradeServiceTest {
                 .content("content")
                 .price(1000)
                 .tradeStatus(TradeStatus.valueOf("SELL"))
-                .keyword("생활용품")
+                .keywordList(keywordSet)
                 .build();
 
         given(tradeRepository.findAll())

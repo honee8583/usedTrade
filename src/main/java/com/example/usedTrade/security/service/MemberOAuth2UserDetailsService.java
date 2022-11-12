@@ -6,6 +6,7 @@ import com.example.usedTrade.member.entity.MemberRole;
 import com.example.usedTrade.member.repository.MemberRepository;
 import com.example.usedTrade.security.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,30 +24,29 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MemberOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
     private final HttpSession httpSession;
-    private static final Logger logger =
-            LoggerFactory.getLogger(UsedTradeApplication.class);
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
-        logger.info("-----------------------------");
-        logger.info("userRequest: " + userRequest);
+        log.info("-----------------------------");
+        log.info("userRequest: " + userRequest);
 
         String clientName = userRequest.getClientRegistration().getClientName();
-        logger.info("clientName: " + clientName);
-        logger.info(userRequest.getAdditionalParameters().toString());
+        log.info("clientName: " + clientName);
+        log.info(userRequest.getAdditionalParameters().toString());
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        logger.info("-------------------");
+        log.info("-------------------");
         oAuth2User.getAttributes().forEach((k, v) -> {
-            logger.info(k + ": " + v);
+            log.info(k + ": " + v);
         });
 
         String email = null;
@@ -54,7 +54,7 @@ public class MemberOAuth2UserDetailsService extends DefaultOAuth2UserService {
             email = oAuth2User.getAttribute("email");
         }
 
-        logger.info("EMAIL: " + email);
+        log.info("EMAIL: " + email);
 
         Member member = saveGoogleMember(email);    // register
         PrincipalDetails principalDetails = new PrincipalDetails(
@@ -62,7 +62,7 @@ public class MemberOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 member.getPassword(),
                 member.getRoles().stream()
                         .map(role ->
-                                new SimpleGrantedAuthority("ROLE_" + role.name()))
+                                new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toSet()),
                 oAuth2User.getAttributes());
 //        httpSession.setAttribute("user", email);

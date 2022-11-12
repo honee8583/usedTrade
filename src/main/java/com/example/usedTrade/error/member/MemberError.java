@@ -1,4 +1,4 @@
-package com.example.usedTrade.member.error;
+package com.example.usedTrade.error.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <style>
+        .errorMessage{
+            color: red;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('#createBtn').click(function() {
+
+                var keywordName = $("input[name='keywordName']").val();
+
+                console.log(keywordName);
+
+                var keyword = {
+                    keywordName: keywordName
+                }
+
+                if (confirm("키워드를 등록하시겠습니까?")) {
+
+                    $.ajax({
+                        url: '/api/keyword',
+                        method: 'POST',
+                        data: JSON.stringify(keyword),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                    }).done(function(result) {
+                        alert('키워드가 등록되었습니다.');
+                        window.location.href = "/keyword/list.do";
+                        console.log(result);
+                    }).fail(function(error) {
+
+                        var errors = error.responseJSON.message;
+
+                        alert("키워드 등록에 실패하였습니다.\n" + errors);
+
+                        $(".errorMessage").html(error.responseJSON.message);
+
+                        console.log(errors);
+                    });
+                }
+
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <h1> 키워드 생성 </h1>
+
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <div id="errorDiv" class="errorMessage">
+
+    </div>
+
+    <div>
+        키워드명: <input type="text" id="keywordName" name="keywordName" placeholder="키워드명 입력"/>
+    </div>
+
+    <div>
+        <button type="button" id="createBtn"> 등록 </button>
+    </div>
+
+</body>
+</html>

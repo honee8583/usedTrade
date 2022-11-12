@@ -16,31 +16,30 @@
 
             $('#registerBtn').click(function() {
 
-                // // email, title, content, price, tradeStatus, keyword
+                // title, content, price, tradeStatus, keyword
                 var tradeInput = {
                     title: $('#title').val(),
                     content: $('#content').val(),
                     price: $('#price').val(),
                     tradeStatus: $('#tradeStatus').val(),
-                    keyword: "생활용품"
+                    keywordList: ["생활용품", "전자기기"]
                 }
 
                 console.log(tradeInput);
 
                 $.ajax({
-                    url: '/api/trade/register',
+                    url: '/api/trade',
                     method: 'post',
                     data: JSON.stringify(tradeInput),
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                 }).done(function(data) {
-                    console.log(data);
-                    // window.location.href = "/";
                     alert('글이 등록되었습니다.');
+                    console.log(data);
                 }).fail(function(error) {
+                    alert("게시글 작성에 실패하였습니다.");
+                    console.log(error);
                     console.log(error.responseJSON);
-
-                    alert("게시글 작성에 실패하였습니다.\n" + error.responseJSON.err);
                 });
 
             });
@@ -65,14 +64,14 @@
             가격: <input type="text" th:field="*{price}" placeholder="비밀번호 확인"/>
             <p class="errorMessage" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Incorrect Data</p>
         </div>
-        <!--
-        <div>
-            <select name="keywordName">
-                <option value="">키워드 선택</option>
-                <option th:each="keyword: ${keywordList}" th:value="${keyword}" th:text="${keyword}"></option>
-            </select>
-        </div>
-        -->
+
+<!--        <div>-->
+<!--            <select name="keywordName">-->
+<!--                <option value="">키워드 선택</option>-->
+<!--                <option th:each="keyword: ${keywordList}" th:value="${keyword}" th:text="${keyword}"></option>-->
+<!--            </select>-->
+<!--        </div>-->
+
         <div>
             <select th:field="*{tradeStatus}">
                 <option value="">거래 여부</option>

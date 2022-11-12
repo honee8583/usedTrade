@@ -1,8 +1,8 @@
 package com.example.usedTrade.security.service;
 
 import com.example.usedTrade.member.entity.Member;
-import com.example.usedTrade.member.error.exception.MemberEmailNotAuthenticatedException;
-import com.example.usedTrade.member.error.exception.MemberStopUserException;
+import com.example.usedTrade.error.member.exception.MemberEmailNotAuthenticatedException;
+import com.example.usedTrade.error.member.exception.MemberStopUserException;
 import com.example.usedTrade.member.repository.MemberRepository;
 import com.example.usedTrade.security.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class MemberDetailsService implements UserDetailsService {
                 member.getPassword(),
                 member.getRoles().stream()
                         .map(role ->
-                                new SimpleGrantedAuthority("ROLE_" + role.name()))
+                                new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toSet()));
 
         return userDetails;

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <style>
+        .list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .list table th, .list table td {
+            border: solid 1px #000;
+        }
+        .list .buttons {
+            position: relative;
+            padding: 10px 0;
+        }
+        .list .buttons a, .list .buttons button {
+            border-width: 0;
+            background-color: transparent;
+            text-decoration: underline;
+            font-size: 14px;
+            line-height: 20px;
+            height: 20px;
+            color: #000;
+            cursor: pointer;
+        }
+        .list .buttons .total-count {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        p.nothing {
+            text-align: center;
+            padding: 100px;
+        }
+        .pager {
+            margin-top: 20px;
+            text-align: center;
+        }
+        <!-- 현재 페이지 활성화 -->
+        .pager a.on {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+            crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            $("#createKeyword").click(function() {
+                window.location.href = "/keyword/create.do";
+            });
+
+           $.ajax({
+               url: '/api/keyword',
+               method: 'GET',
+               contentType: 'application/json; charset=utf-8',
+               dataType: 'json',
+               success: function(keywordList) {
+                   console.log(keywordList);
+
+                   var keywordTableBody = $("#keywordTableBody");
+                   var str = "";
+
+                   $.each(keywordList, function(idx, keyword){
+                       console.log(keyword);
+
+                       str += "<tr>";
+                       str += "<td>" + keyword.id + "</td>";
+                       str += "<td><a href='/keyword/modify.do?keywordId=" + keyword.id + "'>" + keyword.keywordName + "</a></td>";
+                       str += "</tr>";
+
+                       keywordTableBody.html(str);
+                   });
+               },
+               error: function (request, status, error) {
+                   console.log(JSON.stringify(error));
+               }
+           });
+
+        });
+    </script>
+</head>
+<body>
+
+    <h1>키워드 목록</h1>
+
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <div>
+        <button id="createKeyword" type="button"> 키워드 등록 </button>
+    </div>
+
+    <div class="list">
+        <table>
+            <thead>
+                <th>NO</th>
+                <th>키워드</th>
+            </thead>
+            <tbody id="keywordTableBody">
+
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

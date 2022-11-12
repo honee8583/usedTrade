@@ -1,11 +1,11 @@
 package com.example.usedTrade.keyword.entity;
 
+import com.example.usedTrade.keyword.model.KeywordInput;
+import com.example.usedTrade.trade.entity.Trade;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -21,4 +21,7 @@ public class Keyword {
 
     private String keywordName;
 
+    public void modifyKeyword(KeywordInput keywordInput) {
+        this.keywordName = keywordInput.getKeywordName();
+    }
 }

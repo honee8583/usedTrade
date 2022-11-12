@@ -32,7 +32,7 @@ public class Member implements MemberStatus{
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
-    private Set<MemberRole> roles = new HashSet<>();
+    private Set<String> roles = new HashSet<>();
 
     // Email Auth
     private boolean emailAuthYn;
@@ -93,6 +93,6 @@ public class Member implements MemberStatus{
     }
 
     public void addMemberRole(MemberRole memberRole) {
-        roles.add(memberRole);
+        roles.add(String.valueOf(memberRole));
     }
 }

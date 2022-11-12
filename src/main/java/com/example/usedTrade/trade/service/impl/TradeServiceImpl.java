@@ -1,5 +1,7 @@
 package com.example.usedTrade.trade.service.impl;
 
+import com.example.usedTrade.keyword.entity.Keyword;
+import com.example.usedTrade.keyword.repository.KeywordRepository;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.trade.entity.Trade;
 import com.example.usedTrade.trade.entity.TradeStatus;
@@ -8,6 +10,7 @@ import com.example.usedTrade.trade.model.TradeInput;
 import com.example.usedTrade.trade.repository.TradeRepository;
 import com.example.usedTrade.trade.service.TradeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +18,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TradeServiceImpl implements TradeService {
 
     private final TradeRepository tradeRepository;
+    private final KeywordRepository keywordRepository;
 
     @Override
     public void register(TradeInput tradeInput) {
@@ -29,15 +34,21 @@ public class TradeServiceImpl implements TradeService {
                 .content(tradeInput.getContent())
                 .price(tradeInput.getPrice())
                 .tradeStatus(TradeStatus.valueOf(tradeInput.getTradeStatus()))
-                .keyword(tradeInput.getKeyword())
                 .regDt(LocalDateTime.now())
                 .build();
+
+        for (String s: tradeInput.getKeywordList()) {
+            Keyword keyword = keywordRepository.findByKeywordName(s)
+                            .orElseThrow(() -> new RuntimeException(s + " 키워드가 존재하지 않습니다."));
+            trade.addKeyword(s);
+        }
+
         tradeRepository.save(trade);
     }
 
     @Override
-    public void modify(TradeInput tradeInput) {
-        Trade trade = findTrade(tradeInput.getId());
+    public void modify(long tradeId, TradeInput tradeInput) {
+        Trade trade = findTrade(tradeId);
         trade.modifyTrade(tradeInput);
         tradeRepository.save(trade);
     }

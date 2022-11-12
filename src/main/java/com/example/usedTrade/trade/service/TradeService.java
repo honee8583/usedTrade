@@ -1,6 +1,5 @@
 package com.example.usedTrade.trade.service;
 
-import com.example.usedTrade.member.error.ServiceResult;
 import com.example.usedTrade.trade.model.TradeDto;
 import com.example.usedTrade.trade.model.TradeInput;
 
@@ -15,7 +14,7 @@ public interface TradeService {
     /**
      * 거래글 수정
      */
-    void modify(TradeInput tradeInput);
+    void modify(long tradeId, TradeInput tradeInput);
 
     /**
      * 거래글 삭제

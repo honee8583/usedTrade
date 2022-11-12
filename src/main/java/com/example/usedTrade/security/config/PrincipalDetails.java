@@ -26,16 +26,18 @@ public class PrincipalDetails extends User implements OAuth2User{
     private Map<String, Object> attr;
 
     // Normal Login
-    public PrincipalDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public PrincipalDetails(String username, String password,
+                            Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.email = username;
         this.password = password;
     }
 
     // OAuth2Login
-    public PrincipalDetails(String username, String password, Collection<? extends GrantedAuthority> authorities,
+    public PrincipalDetails(String username, String password,
+                            Collection<? extends GrantedAuthority> authorities,
                             Map<String, Object> attr) {
-        this(username, password, authorities);
+        super(username, password, authorities);
         this.attr = attr;
     }
 

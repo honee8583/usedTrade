@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+
+            const searchParams = new URLSearchParams(location.search);
+            var keywordId = searchParams.get("keywordId");
+
+            // 수정할 데이터 불러오기
+            $.ajax({
+                url: '/api/keyword/' + keywordId,
+                method: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function(keywordDto) {
+                    console.log(keywordDto);
+
+                    $("input[name='keywordName']").attr("value", keywordDto.keywordName);
+
+                },
+                error: function (request, status, error) {
+                    console.log(JSON.stringify(error));
+                    alert("데이터를 불러오지 못했습니다.");
+                }
+            });
+
+            // 수정버튼
+            $('#modifyBtn').click(function() {
+
+                var keywordInput = {
+                    keywordName: $("input[name='keywordName']").val()
+                }
+
+                console.log(keywordInput.keywordName);
+
+                $.ajax({
+                    url: '/api/keyword/' + keywordId,
+                    method: 'PUT',
+                    data: JSON.stringify(keywordInput),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                }).done(function(result) {
+                    alert('키워드가 수정되었습니다.');
+                    window.location.href = "/keyword/list.do";
+                    console.log(result);
+                }).fail(function(error) {
+                    alert("키워드 수정에 실패하였습니다." + error.responseJSON);
+                    console.log(error);
+                    console.log(error.responseJSON);
+                });
+
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <h1> 키워드 수정 </h1>
+
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <div>
+        제목: <input type="text" name="keywordName" id="keywordName" value="" placeholder="제목 입력"/>
+    </div>
+
+    <div>
+        <button type="button" id="modifyBtn"> 수정 </button>
+    </div>
+
+</body>
+</html>

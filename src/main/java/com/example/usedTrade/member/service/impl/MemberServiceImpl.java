@@ -1,19 +1,19 @@
 package com.example.usedTrade.member.service.impl;
 
-import com.example.usedTrade.UsedTradeApplication;
 import com.example.usedTrade.mail.MailComponents;
 import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.member.entity.MemberRole;
 import com.example.usedTrade.member.entity.MemberStatus;
-import com.example.usedTrade.member.error.MemberError;
-import com.example.usedTrade.member.error.ServiceResult;
+import com.example.usedTrade.error.member.MemberError;
+import com.example.usedTrade.error.member.ServiceResult;
+import com.example.usedTrade.error.member.exception.MemberEmailNotAuthenticatedException;
+import com.example.usedTrade.error.member.exception.MemberStopUserException;
 import com.example.usedTrade.member.model.*;
 import com.example.usedTrade.member.repository.MemberRepository;
 import com.example.usedTrade.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
@@ -29,15 +30,13 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final MailComponents mailComponents;
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(UsedTradeApplication.class);
-
     @Override
     public ServiceResult register(MemberInput memberInput) {
         // 존재하는 회원인지 체크
         Optional<Member> optionalMember = memberRepository.findById(memberInput.getEmail());
         if (optionalMember.isPresent()) {
-            return new ServiceResult(false, MemberError.MEMBER_ALREADY_EXISTS);
+//            return new ServiceResult(false, MemberError.MEMBER_ALREADY_EXISTS);
+            throw new RuntimeException("이미 존재하는 회원입니다.");
         }
 
         String encPassword = BCrypt.hashpw(memberInput.getPassword(), BCrypt.gensalt());
@@ -87,7 +86,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         member.changeEmailAuth(MemberStatus.MEMBER_STATUS_AVAILABLE, true, LocalDateTime.now());
-        logger.info(member.toString());
+        log.info(member.toString());
         memberRepository.save(member);
 
         return new ServiceResult();

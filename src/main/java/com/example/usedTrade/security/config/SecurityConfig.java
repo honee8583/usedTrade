@@ -33,19 +33,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
         http.headers().frameOptions().sameOrigin();
+        http.csrf().disable();
+
+//        http.httpBasic().disable()  // 세션 방식 사용x
+//                .csrf().disable()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+//                    .addFilter(jwtAuthorizationFilter)   //formLogin().disable()때문에 동작하지 않는
+//                    .addFilter(jwtAuthenticationFilter);
 
         http.authorizeRequests()
                 .antMatchers(
                         "/",
-                        "/member/register",
-                        "/member/email-auth",
-                        "/member/reset/**",
+                        "/member/**",
                         "/h2-console"
                 )
                 .permitAll()
-                .antMatchers("/trade/**").hasRole("USER");
+                .antMatchers("/trade/**", "/api/trade/**").hasRole("USER")
+                .antMatchers("/api/keyword/**", "/keyword/**").hasRole("ADMIN");
 
         http.formLogin()
                 .loginPage("/member/login")
@@ -54,7 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         http.oauth2Login().defaultSuccessUrl("/");
-
 
         http.logout()
                 .logoutRequestMatcher(

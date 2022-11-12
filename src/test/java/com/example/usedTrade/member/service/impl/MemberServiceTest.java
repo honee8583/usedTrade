@@ -3,7 +3,7 @@ package com.example.usedTrade.member.service.impl;
 import com.example.usedTrade.mail.MailComponents;
 import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.entity.Member;
-import com.example.usedTrade.member.error.ServiceResult;
+import com.example.usedTrade.error.member.ServiceResult;
 import com.example.usedTrade.member.model.ChangeMemberInput;
 import com.example.usedTrade.member.model.MemberInput;
 import com.example.usedTrade.member.model.ResetPasswordInput;

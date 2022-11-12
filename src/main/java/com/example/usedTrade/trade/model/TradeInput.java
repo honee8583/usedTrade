@@ -4,6 +4,7 @@ import com.example.usedTrade.trade.entity.TradeStatus;
 import lombok.*;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,6 +30,6 @@ public class TradeInput {
     @NotEmpty(message = "판매여부는 필수 입력 사항입니다.")
     private String tradeStatus;
 
-    @NotBlank(message = "키워드는 필수 입력 사항입니다.")
-    private String keyword;
+    @NotEmpty(message = "키워드는 필수 입력 사항입니다.")
+    private List<String> keywordList;
 }
