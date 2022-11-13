@@ -1,5 +1,7 @@
 package com.example.usedTrade.trade.controller;
 
+import com.example.usedTrade.page.PageRequestDTO;
+import com.example.usedTrade.page.PageResultDTO;
 import com.example.usedTrade.trade.model.TradeDto;
 import com.example.usedTrade.trade.model.TradeInput;
 import com.example.usedTrade.trade.service.TradeService;
@@ -7,12 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,10 +35,13 @@ public class ApiTradeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TradeDto>> getList() {
-        List<TradeDto> dtoList = tradeService.getTradeList();
+    public ResponseEntity<PageResultDTO> getList(@RequestParam("page") int page) {
+        log.info("api getTradeList page: " + page);
 
-        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+        PageResultDTO pageResultDTO =
+                tradeService.getTradeList(new PageRequestDTO(page, 5));
+
+        return new ResponseEntity<>(pageResultDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

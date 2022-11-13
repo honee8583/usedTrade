@@ -1,6 +1,5 @@
 package com.example.usedTrade.trade.model;
 
-import com.example.usedTrade.keyword.entity.Keyword;
 import com.example.usedTrade.trade.entity.Trade;
 import com.example.usedTrade.trade.entity.TradeStatus;
 import lombok.*;
@@ -19,6 +18,7 @@ import java.util.List;
 @ToString
 public class TradeDto {
     private long id;
+    private long idx;
     private String email;
     private String title;
     private String content;
