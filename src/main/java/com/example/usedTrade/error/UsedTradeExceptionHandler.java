@@ -13,8 +13,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
-public class ValidationExceptionHandler {
+public class UsedTradeExceptionHandler {
 
+    /**
+     * Validation 예외 핸들러
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> ValidationErrorHandler(MethodArgumentNotValidException e) {
 
@@ -32,5 +35,18 @@ public class ValidationExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.resolve(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    /**
+     * 모든 컨트롤러 예외 처리
+     */
+    @ExceptionHandler(AbstractException.class)
+    public ResponseEntity<ErrorResponse> tradeExceptionHandler(AbstractException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(e.getStatusCode())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(e.getStatusCode()));
     }
 }

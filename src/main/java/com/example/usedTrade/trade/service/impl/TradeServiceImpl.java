@@ -1,5 +1,7 @@
 package com.example.usedTrade.trade.service.impl;
 
+import com.example.usedTrade.error.keyword.exception.KeywordNotFoundException;
+import com.example.usedTrade.error.trade.exception.TradeNotFoundException;
 import com.example.usedTrade.keyword.entity.Keyword;
 import com.example.usedTrade.keyword.repository.KeywordRepository;
 import com.example.usedTrade.member.entity.Member;
@@ -39,7 +41,7 @@ public class TradeServiceImpl implements TradeService {
 
         for (String s: tradeInput.getKeywordList()) {
             Keyword keyword = keywordRepository.findByKeywordName(s)
-                            .orElseThrow(() -> new RuntimeException(s + " 키워드가 존재하지 않습니다."));
+                            .orElseThrow(KeywordNotFoundException::new);
             trade.addKeyword(s);
         }
 
@@ -76,6 +78,6 @@ public class TradeServiceImpl implements TradeService {
 
     private Trade findTrade(long tradeId) {
         return tradeRepository.findById(tradeId)
-                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+                .orElseThrow(TradeNotFoundException::new);
     }
 }
