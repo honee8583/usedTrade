@@ -1,6 +1,7 @@
 package com.example.usedTrade.trade.controller;
 
 import com.example.usedTrade.keyword.service.KeywordService;
+import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.trade.entity.TradeStatus;
 import com.example.usedTrade.trade.model.TradeInput;
 import com.example.usedTrade.trade.service.TradeService;
@@ -32,7 +33,8 @@ public class TradeController {
     }
 
     @GetMapping("/list")
-    public String getList() {
+    public String getList(PageRequestDTO pageRequestDTO) {
+        log.info("list PageRequestDto: " + pageRequestDTO.toString());
 
         return "trade/list";
     }
