@@ -19,87 +19,10 @@
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
             crossorigin="anonymous"></script>
 
-    <script th:inline="javascript">
+    <script>
         $(document).ready(function () {
 
-            // 현재 게시글 번호
-            const searchParams = new URLSearchParams(location.search);
-            var tradeId = searchParams.get("tradeId");
 
-            function formatTime(str) {
-                var date = new Date(str);
-
-                return date.getFullYear() + '/' +
-                    (date.getMonth() + 1) + '/' +
-                    date.getDate() + ' ' +
-                    date.getHours() + ':' +
-                    date.getMinutes();
-            }
-
-            $.ajax({
-                url: '/api/trade/' + tradeId,
-                method: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                success: function(tradeDto) {
-                    console.log(tradeDto);
-
-                    var str = "";
-                    var btnStr = "";
-                    var username = [[${username}]];
-
-                    str += "<p>제목: " + tradeDto.title + "</p>";
-                    str += "<p>내용: " + tradeDto.content + "</p>";
-                    str += "<p>작성자: " + tradeDto.email + "</p>";
-                    str += "<p>가격: " + tradeDto.price + "</p>";
-                    str += "<p>키워드: " + tradeDto.keywordList + "</p>";
-                    str += "<p>판매여부: " + tradeDto.tradeStatus + "</p>";
-                    str += "<p>작성일: " + formatTime(tradeDto.regDt) + "</p>";
-
-                    btnStr += "<button id='listBtn' type='button'>목록</button>";
-                    if (tradeDto.email === username) {
-                        btnStr += "<button id='modifyBtn' type='button'>수정</button>";
-                        btnStr += "<button id='deleteBtn' type='button'>삭제</button>";
-                    }
-
-                    $("#tradeDetail").html(str);
-                    $("#buttonList").html(btnStr);
-                },
-                error: function (request, status, error) {
-                    console.log(JSON.stringify(error));
-                    alert("데이터를 불러오지 못했습니다.");
-                }
-            });
-
-            $(document).on("click", "#listBtn", function() {
-                // alert('listBtn');
-               window.location.href = "/trade/list";
-            });
-
-            $(document).on("click", "#modifyBtn", function() {
-               window.location.href = "/trade/modify?tradeId=" + tradeId;
-            });
-
-            $(document).on("click", "#deleteBtn", function() {
-
-               if (confirm('삭제하시겠습니까?')) {
-
-                   $.ajax({
-                       url: "/api/trade/" + tradeId,
-                       method: "DELETE",
-                       success: function(data) {
-                           alert("삭제에 성공하였습니다.");
-                           window.location.href = "/trade/list";
-                       },
-                       error: function (request, status, error) {
-                           console.log(JSON.stringify(error));
-                           alert("삭제에 실패하였습니다.");
-                       }
-                   });
-
-               }
-
-            });
 
         });
     </script>
@@ -108,13 +31,19 @@
     <h1> 상세 페이지 </h1>
     <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
 
-    <div id="tradeDetail">
-
+    <div>
+        <p th:text="'제목: ' + ${tradeDto.title}">title</p>
+        <p th:text="'내용: ' + ${tradeDto.content}">content</p>
+        <p th:text="'작성자: ' + ${tradeDto.email}">email</p>
+        <p th:text="'가격: ' + ${tradeDto.price} + '원'">price</p>
+        <p th:text="'키워드: ' + ${tradeDto.keywordList}">keywordList</p>
+        <p th:text="'판매여부: ' + ${tradeDto.tradeStatus}">tradeStatus</p>
+        <p th:text="'작성일: ' + ${tradeDto.regDt}">regDt</p>
     </div>
 
-    <!-- 수정, 삭제 버튼은 본인이 맞을경우에만 보이게 설정 (자바스크립트) -->
-    <div id="buttonList">
-
+    <div>
+        <button th:if="${tradeDto.email == username}" th:onclick="|location.href='@{/trade/modify(tradeId=${tradeDto.id})}'|"> 수정 </button>
+        <button th:onclick="|location.href='@{/trade/list}'|"> 목록 </button>
     </div>
 
 </body>

@@ -5,6 +5,7 @@ import com.example.usedTrade.trade.entity.TradeStatus;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,31 @@ import java.util.List;
 @Builder
 @ToString
 public class TradeDto {
-    private long id;
+    private Long id;
+
     private long idx;
+
     private String email;
+
+    @NotBlank(message = "제목은 필수 입력 사항입니다.")
     private String title;
+
+    @NotBlank(message = "내용은 필수 입력 사항입니다.")
     private String content;
+
+    @NotNull(message = "가격은 필수 입력 사항입니다.")
+    @Min(value = 0, message = "가격은 최소 0원입니다.")
+    @Max(value = 100000000, message = "가격은 최대 100000000원입니다.")
     private int price;
-    private List<String> keywordList = new ArrayList<>();
-    private TradeStatus tradeStatus;
+
+    @NotEmpty(message = "판매여부는 필수 입력 사항입니다.")
+    private String tradeStatus;
+
+    @NotNull(message = "키워드는 필수 입력 사항입니다.")
+    private List<String> keywordList;
+
     private LocalDateTime regDt;
+
     private LocalDateTime upDt;
 
     public static TradeDto entityToDto(Trade trade) {
@@ -35,7 +52,7 @@ public class TradeDto {
                 .title(trade.getTitle())
                 .content(trade.getContent())
                 .price(trade.getPrice())
-                .tradeStatus(trade.getTradeStatus())
+                .tradeStatus(String.valueOf(trade.getTradeStatus()))
                 .regDt(trade.getRegDt())
                 .upDt(trade.getUpDt())
                 .build();

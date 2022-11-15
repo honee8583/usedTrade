@@ -3,21 +3,17 @@ package com.example.usedTrade.trade.service;
 import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.page.PageResultDTO;
 import com.example.usedTrade.trade.model.TradeDto;
-import com.example.usedTrade.trade.model.TradeInput;
-
-import java.awt.print.Pageable;
-import java.util.List;
 
 public interface TradeService {
     /**
      * 거래글 등록
      */
-    void register(TradeInput tradeInput);
+    void register(TradeDto tradeDto);
 
     /**
      * 거래글 수정
      */
-    void modify(long tradeId, TradeInput tradeInput);
+    void modify(long tradeId, TradeDto tradeDto);
 
     /**
      * 거래글 삭제

@@ -11,7 +11,8 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
             crossorigin="anonymous"></script>
-    <script>
+
+    <script th:inline="javascript">
         $(document).ready(function () {
 
             // 키워드 리스트 불러오기
@@ -21,61 +22,29 @@
                 contentType: 'application/json; charset=utf-8',
                 dataType: "json",
                 success: function(keywordList) {
-                    console.log("getKeywordList");
                     console.log(keywordList);
 
-                    var str = "";
+                    var str = "키워드선택 : ";
                     $.each(keywordList, function (index, keyword) {
-                        str += "<label><input type='checkbox' name='keyword' value='" + keyword.keywordName + "'/>" + keyword.keywordName + "</label>";
+                        str += "<label><input type='checkbox' name='keywordList' value='" + keyword.keywordName + "'/>"
+                            + keyword.keywordName + "</label>";
                     });
+                    // str += "<p class=\"errorMessage\" th:if=\"${#fields.hasErrors('keywordList')}\" "
+                    //     + "th:errors=\"*{keywordList}\">Incorrect Data</p>"
 
                     $('#keywordListDiv').html(str);
+
+                    var keywords = [[${tradeDto.keywordList}]];
+                    console.log("keywords: " + keywords);
+
+                    $.each(keywords, function(index, keyword2) {   // 가져온 키워드
+                        $("input:checkbox[value='" + keyword2 + "']").attr("checked", true);
+                    });
 
                 },error: function(error) {
                     alert("키워드를 불러오는데 실패했습니다.");
                     console.log(error.responseJSON);
                 }
-            });
-
-            // 게시글 등록 버튼
-            $('#registerBtn').click(function() {
-
-                var keywordList = [];
-                $('input:checkbox[name="keyword"]').each(function() {
-                    if(this.checked){
-                        keywordList.push(this.value)
-                    }
-                });
-
-                console.log(keywordList);
-
-                // title, content, price, tradeStatus, keywordList
-                var tradeInput = {
-                    title: $('#title').val(),
-                    content: $('#content').val(),
-                    price: $('#price').val(),
-                    tradeStatus: $('#tradeStatus').val(),
-                    keywordList: keywordList
-                }
-
-                console.log(tradeInput);
-
-                $.ajax({
-                    url: '/api/trade',
-                    method: 'post',
-                    data: JSON.stringify(tradeInput),
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                }).done(function(data) {
-                    alert('글이 등록되었습니다.');
-                    window.location.href = "/trade/list";
-                    console.log(data);
-                }).fail(function(error) {
-                    alert("게시글 작성에 실패하였습니다.");
-                    console.log(error);
-                    console.log(error.responseJSON);
-                });
-
             });
 
         });
@@ -85,7 +54,10 @@
     <h1> 거래글 작성 </h1>
     <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
 
-    <form id="registerForm" action="/api/trade/register" method="post" th:object="${tradeInput}">
+    <form id="registerForm" action="/trade/register" method="post" th:object="${tradeDto}">
+        <input type="hidden" th:name="tradeId" th:value="${tradeDto.id}"/>
+        <input type="hidden" th:name="id" th:value="${tradeDto.id}"/>
+
         <div>
             제목: <input type="text" th:field="*{title}" placeholder="제목 입력"/>
             <p class="errorMessage" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Incorrect Data</p>
@@ -95,15 +67,17 @@
             <p class="errorMessage" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">Incorrect Data</p>
         </div>
         <div>
-            가격: <input type="text" th:field="*{price}" placeholder="비밀번호 확인"/>
+            가격: <input type="text" th:field="*{price}" placeholder="가격 입력"/>
             <p class="errorMessage" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Incorrect Data</p>
         </div>
 
+        <!--todo-->
         <div id="keywordListDiv">
 
         </div>
 
         <div>
+            판매여부:
             <select th:field="*{tradeStatus}">
                 <option value="">거래 여부</option>
                 <option th:value="SELL">판매</option>
@@ -112,8 +86,14 @@
             <p class="errorMessage" th:if="${#fields.hasErrors('tradeStatus')}" th:errors="*{tradeStatus}">Incorrect Data</p>
         </div>
 
-        <div>
-            <button type="button" id="registerBtn"> 작성 </button>
+        </div>
+
+        <div th:if="${#strings.isEmpty(tradeDto.id)}">
+            <button th:formaction="@{/trade/register}" type="submit"> 저장 </button>
+        </div>
+        <div th:unless="${#strings.isEmpty(tradeDto.id)}">
+            <button th:formaction="@{/trade/modify(tradeId=${tradeDto.id})}" type="submit"> 수정 </button>
+            <button th:formaction="@{/trade/delete}" type="submit"> 삭제 </button>
         </div>
     </form>
 

@@ -52,85 +52,85 @@
     <script>
         $(document).ready(function() {
 
-            const searchParams = new URLSearchParams(location.search);
-            var pageParam = searchParams.get("page");
-            var page = {
-                page: pageParam
-            }
-
-            if (pageParam == null) {
-                page = {
-                    page: 1
-                }
-            }
-
-            console.log("parameter: " + page);
-
-            function formatTime(str) {
-                var date = new Date(str);
-
-                return date.getFullYear() + '/' +
-                    (date.getMonth() + 1) + '/' +
-                    date.getDate() + ' ' +
-                    date.getHours() + ':' +
-                    date.getMinutes();
-            }
-
-            var url = "/api/trade";
-            if (pageParam!=null) {
-                url += "?page=";
-                url += parseInt(pageParam);
-            }
-
-           $.ajax({
-               url: "/api/trade",
-               method: 'GET',
-               data: page,    // TODO
-               dataType: 'json',
-               success: function(pageResultDto) {
-                   console.log(pageResultDto);
-
-                   var tradeTableBody = $("#tradeTableBody");
-                   var str = "";
-
-                   $.each(pageResultDto.dtoList, function(index, trade){
-                       console.log(trade);
-
-                       str += "<tr>";
-                       str += "<td>" + trade.idx + "</td>";
-                       str += "<td><a href='/trade/detail?tradeId=" + trade.id + "'>" + trade.title + "</a></td>";
-                       str += "<td>" + trade.price + "원</td>";
-                       str += "<td>" + trade.keywordList + "</td>";
-                       str += "<td>" + trade.email + "</td>";
-                       str += "<td>" + formatTime(trade.regDt) + "</td>";
-                       str += "</tr>";
-
-                       tradeTableBody.html(str);
-                   });
-
-                   // paging
-                   var str2 = "";
-
-                   // prev btn
-                   if (pageResultDto.prev) {
-                       str2 += "<a href='/trade/list?page=" + (pageResultDto.start - 1) + "'>Previous</a> ";
-                   }
-
-                   $.each(pageResultDto.pageList, function(index, page) {
-                       str2 += "<a href='/trade/list?page=" + page + "'>" + page + "</a> ";
-                   });
-
-                   // next btn
-                   if (pageResultDto.next) {
-                       str2 += " <a href='/trade/list?page=" + (pageResultDto.end + 1) + "'>Next</a>";
-                   }
-
-                   $(".pager").html(str2);
-               },
-               error: function (request, status, error) {
-                   console.log(JSON.stringify(error));
-               }
-           });
+           //  const searchParams = new URLSearchParams(location.search);
+           //  var pageParam = searchParams.get("page");
+           //  var page = {
+           //      page: pageParam
+           //  }
+           //
+           //  if (pageParam == null) {
+           //      page = {
+           //          page: 1
+           //      }
+           //  }
+           //
+           //  console.log("parameter: " + page);
+           //
+           //  function formatTime(str) {
+           //      var date = new Date(str);
+           //
+           //      return date.getFullYear() + '/' +
+           //          (date.getMonth() + 1) + '/' +
+           //          date.getDate() + ' ' +
+           //          date.getHours() + ':' +
+           //          date.getMinutes();
+           //  }
+           //
+           //  var url = "/api/trade";
+           //  if (pageParam!=null) {
+           //      url += "?page=";
+           //      url += parseInt(pageParam);
+           //  }
+           //
+           // $.ajax({
+           //     url: "/api/trade",
+           //     method: 'GET',
+           //     data: page,    // TODO
+           //     dataType: 'json',
+           //     success: function(pageResultDto) {
+           //         console.log(pageResultDto);
+           //
+           //         var tradeTableBody = $("#tradeTableBody");
+           //         var str = "";
+           //
+           //         $.each(pageResultDto.dtoList, function(index, trade){
+           //             console.log(trade);
+           //
+           //             str += "<tr>";
+           //             str += "<td>" + trade.idx + "</td>";
+           //             str += "<td><a href='/trade/detail?tradeId=" + trade.id + "'>" + trade.title + "</a></td>";
+           //             str += "<td>" + trade.price + "원</td>";
+           //             str += "<td>" + trade.keywordList + "</td>";
+           //             str += "<td>" + trade.email + "</td>";
+           //             str += "<td>" + formatTime(trade.regDt) + "</td>";
+           //             str += "</tr>";
+           //
+           //             tradeTableBody.html(str);
+           //         });
+           //
+           //         // paging
+           //         var str2 = "";
+           //
+           //         // prev btn
+           //         if (pageResultDto.prev) {
+           //             str2 += "<a href='/trade/list?page=" + (pageResultDto.start - 1) + "'>Previous</a> ";
+           //         }
+           //
+           //         $.each(pageResultDto.pageList, function(index, page) {
+           //             str2 += "<a href='/trade/list?page=" + page + "'>" + page + "</a> ";
+           //         });
+           //
+           //         // next btn
+           //         if (pageResultDto.next) {
+           //             str2 += " <a href='/trade/list?page=" + (pageResultDto.end + 1) + "'>Next</a>";
+           //         }
+           //
+           //         $(".pager").html(str2);
+           //     },
+           //     error: function (request, status, error) {
+           //         console.log(JSON.stringify(error));
+           //     }
+           // });
 
         });
     </script>
@@ -156,9 +156,30 @@
                 <th>작성일</th>
             </thead>
             <tbody id="tradeTableBody">
-
+                <tr th:each="dto: ${pageResultDTO.dtoList}">
+                    <td>
+                        <p th:text="${dto.idx}">idx</p>
+                    </td>
+                    <td>
+                        <p><a th:href="@{/trade/detail(tradeId=${dto.id})}" th:text="${dto.title}">title</a></p>
+                    </td>
+                    <td>
+                        <p th:text="${dto.price} + 원">price</p>
+                    </td>
+                    <td>
+                        <p th:text="${dto.keywordList}">keywords</p>
+                    </td>
+                    <td>
+                        <p th:text="${dto.email}">register email</p>
+                    </td>
+                    <td>
+                        <!-- TODO <p th:text="${#dates.format(dto.regDt, 'yyyy/MM/dd HH:mm:ss')}">regDt</p>-->
+                        <p th:text="${dto.regDt}">regDt</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
+
     </div>
 
     <div class="pager">

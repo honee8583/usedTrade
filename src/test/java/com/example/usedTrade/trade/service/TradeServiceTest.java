@@ -8,7 +8,6 @@ import com.example.usedTrade.page.PageResultDTO;
 import com.example.usedTrade.trade.entity.Trade;
 import com.example.usedTrade.trade.entity.TradeStatus;
 import com.example.usedTrade.trade.model.TradeDto;
-import com.example.usedTrade.trade.model.TradeInput;
 import com.example.usedTrade.trade.repository.TradeRepository;
 import com.example.usedTrade.trade.service.impl.TradeServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -44,7 +43,7 @@ class TradeServiceTest {
     void testRegister() {
         // given
         List<String> keywordList = Arrays.asList("생활용품", "전자기기");
-        TradeInput tradeInput = TradeInput.builder()
+        TradeDto tradeDto = TradeDto.builder()
                 .title("title")
                 .content("content")
                 .price(1000)
@@ -62,7 +61,7 @@ class TradeServiceTest {
         given(keywordRepository.findByKeywordName(anyString())).willReturn(Optional.of(keyword2));
 
         // when
-        tradeService.register(tradeInput);
+        tradeService.register(tradeDto);
         keywordRepository.findByKeywordName("생활용품");
         keywordRepository.findByKeywordName("전자기기");
 
@@ -74,7 +73,7 @@ class TradeServiceTest {
     void testModify() {
         // given
         List<String> keywordList = Arrays.asList("생활용품", "전자기기");
-        TradeInput modifyInput = TradeInput.builder()
+        TradeDto modifyInput = TradeDto.builder()
                 .title("title2")
                 .content("content2")
                 .price(1000)
@@ -168,7 +167,7 @@ class TradeServiceTest {
         assertEquals("title", tradeDto.getTitle());
         assertEquals("content", tradeDto.getContent());
         assertEquals(1000, tradeDto.getPrice());
-        assertEquals(TradeStatus.SELL, tradeDto.getTradeStatus());
+        assertEquals(String.valueOf(TradeStatus.SELL), tradeDto.getTradeStatus());
         assertTrue(tradeDto.getKeywordList().contains("생활용품"));
         assertTrue(tradeDto.getKeywordList().contains("전자기기"));
     }

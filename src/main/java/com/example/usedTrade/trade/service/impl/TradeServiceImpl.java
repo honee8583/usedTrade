@@ -10,22 +10,17 @@ import com.example.usedTrade.page.PageResultDTO;
 import com.example.usedTrade.trade.entity.Trade;
 import com.example.usedTrade.trade.entity.TradeStatus;
 import com.example.usedTrade.trade.model.TradeDto;
-import com.example.usedTrade.trade.model.TradeInput;
 import com.example.usedTrade.trade.repository.TradeRepository;
 import com.example.usedTrade.trade.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,17 +31,17 @@ public class TradeServiceImpl implements TradeService {
     private final KeywordRepository keywordRepository;
 
     @Override
-    public void register(TradeInput tradeInput) {
+    public void register(TradeDto tradeDto) {
         Trade trade = Trade.builder()
-                .member(Member.builder().email(tradeInput.getEmail()).build())
-                .title(tradeInput.getTitle())
-                .content(tradeInput.getContent())
-                .price(tradeInput.getPrice())
-                .tradeStatus(TradeStatus.valueOf(tradeInput.getTradeStatus()))
+                .member(Member.builder().email(tradeDto.getEmail()).build())
+                .title(tradeDto.getTitle())
+                .content(tradeDto.getContent())
+                .price(tradeDto.getPrice())
+                .tradeStatus(TradeStatus.valueOf(tradeDto.getTradeStatus()))
                 .regDt(LocalDateTime.now())
                 .build();
 
-        for (String s: tradeInput.getKeywordList()) {
+        for (String s: tradeDto.getKeywordList()) {
             Keyword keyword = keywordRepository.findByKeywordName(s)
                             .orElseThrow(KeywordNotFoundException::new);
             trade.addKeyword(s);
@@ -56,9 +51,9 @@ public class TradeServiceImpl implements TradeService {
     }
 
     @Override
-    public void modify(long tradeId, TradeInput tradeInput) {
+    public void modify(long tradeId, TradeDto tradeDto) {
         Trade trade = findTrade(tradeId);
-        trade.modifyTrade(tradeInput);
+        trade.modifyTrade(tradeDto);
         tradeRepository.save(trade);
     }
 

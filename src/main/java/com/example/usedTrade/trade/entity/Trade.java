@@ -1,13 +1,11 @@
 package com.example.usedTrade.trade.entity;
 
-import com.example.usedTrade.keyword.entity.Keyword;
 import com.example.usedTrade.member.entity.Member;
-import com.example.usedTrade.trade.model.TradeInput;
+import com.example.usedTrade.trade.model.TradeDto;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,15 +38,15 @@ public class Trade {
     private LocalDateTime regDt;
     private LocalDateTime upDt;
 
-    public void modifyTrade(TradeInput tradeInput) {
-        this.tradeStatus = TradeStatus.valueOf(tradeInput.getTradeStatus());
-        this.title = tradeInput.getTitle();
-        this.content = tradeInput.getContent();
-        this.price = tradeInput.getPrice();
+    public void modifyTrade(TradeDto tradeDto) {
+        this.tradeStatus = TradeStatus.valueOf(tradeDto.getTradeStatus());
+        this.title = tradeDto.getTitle();
+        this.content = tradeDto.getContent();
+        this.price = tradeDto.getPrice();
         this.upDt = LocalDateTime.now();
         this.keywordList = new HashSet<>();
 
-        for (String k: tradeInput.getKeywordList()) {
+        for (String k: tradeDto.getKeywordList()) {
             this.keywordList.add(k);
         }
     }
