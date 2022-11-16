@@ -49,88 +49,18 @@
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
             crossorigin="anonymous"></script>
 
-    <script>
+    <script th:inline="javascript">
         $(document).ready(function() {
 
-           //  const searchParams = new URLSearchParams(location.search);
-           //  var pageParam = searchParams.get("page");
-           //  var page = {
-           //      page: pageParam
-           //  }
-           //
-           //  if (pageParam == null) {
-           //      page = {
-           //          page: 1
-           //      }
-           //  }
-           //
-           //  console.log("parameter: " + page);
-           //
-           //  function formatTime(str) {
-           //      var date = new Date(str);
-           //
-           //      return date.getFullYear() + '/' +
-           //          (date.getMonth() + 1) + '/' +
-           //          date.getDate() + ' ' +
-           //          date.getHours() + ':' +
-           //          date.getMinutes();
-           //  }
-           //
-           //  var url = "/api/trade";
-           //  if (pageParam!=null) {
-           //      url += "?page=";
-           //      url += parseInt(pageParam);
-           //  }
-           //
-           // $.ajax({
-           //     url: "/api/trade",
-           //     method: 'GET',
-           //     data: page,    // TODO
-           //     dataType: 'json',
-           //     success: function(pageResultDto) {
-           //         console.log(pageResultDto);
-           //
-           //         var tradeTableBody = $("#tradeTableBody");
-           //         var str = "";
-           //
-           //         $.each(pageResultDto.dtoList, function(index, trade){
-           //             console.log(trade);
-           //
-           //             str += "<tr>";
-           //             str += "<td>" + trade.idx + "</td>";
-           //             str += "<td><a href='/trade/detail?tradeId=" + trade.id + "'>" + trade.title + "</a></td>";
-           //             str += "<td>" + trade.price + "원</td>";
-           //             str += "<td>" + trade.keywordList + "</td>";
-           //             str += "<td>" + trade.email + "</td>";
-           //             str += "<td>" + formatTime(trade.regDt) + "</td>";
-           //             str += "</tr>";
-           //
-           //             tradeTableBody.html(str);
-           //         });
-           //
-           //         // paging
-           //         var str2 = "";
-           //
-           //         // prev btn
-           //         if (pageResultDto.prev) {
-           //             str2 += "<a href='/trade/list?page=" + (pageResultDto.start - 1) + "'>Previous</a> ";
-           //         }
-           //
-           //         $.each(pageResultDto.pageList, function(index, page) {
-           //             str2 += "<a href='/trade/list?page=" + page + "'>" + page + "</a> ";
-           //         });
-           //
-           //         // next btn
-           //         if (pageResultDto.next) {
-           //             str2 += " <a href='/trade/list?page=" + (pageResultDto.end + 1) + "'>Next</a>";
-           //         }
-           //
-           //         $(".pager").html(str2);
-           //     },
-           //     error: function (request, status, error) {
-           //         console.log(JSON.stringify(error));
-           //     }
-           // });
+           var searchForm = $("#searchForm");
+
+           $('.btn-search').click(function(e) {
+               searchForm.submit();
+           });
+
+           $('.btn-clear').click(function(e) {
+               searchForm.empty().submit();
+           });
 
         });
     </script>
@@ -145,6 +75,29 @@
         <a href="/trade/register">거래글 등록</a>
     </div>
 
+    <form action="/trade/list" method="get" id="searchForm">
+        <input type="hidden" name="page" value="1"/>    <!--기본 1페이지-->
+        <div>
+            <select name="type">
+                <option th:selected="${pageRequestDTO.type == null}">-------</option>
+                <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
+                <option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
+                <option value="e" th:selected="${pageRequestDTO.type == 'e'}">작성자</option>
+                <option value="k" th:selected="${pageRequestDTO.type == 'k'}">키워드</option>
+
+                <option value="tc" th:selected="${pageRequestDTO.type == 'tc'}">제목 + 내용</option>
+                <option value="tce" th:selected="${pageRequestDTO.type == 'tce'}">제목 + 내용 + 작성자</option>
+            </select>
+        </div>
+        <input name="keyword" th:value="${pageRequestDTO.keyword}">
+        <div>
+            <button class="btn-search" type="button">Search</button>
+            <button class="btn-clear" type="button">Clear</button>
+        </div>
+    </form>
+
+    <hr/>
+
     <div class="list">
         <table>
             <thead>
@@ -158,10 +111,15 @@
             <tbody id="tradeTableBody">
                 <tr th:each="dto: ${pageResultDTO.dtoList}">
                     <td>
-                        <p th:text="${dto.idx}">idx</p>
+                        <p th:text="${dto.id}">idx</p>
                     </td>
                     <td>
-                        <p><a th:href="@{/trade/detail(tradeId=${dto.id})}" th:text="${dto.title}">title</a></p>
+                        <p>
+                            <a th:href="@{/trade/detail(tradeId=${dto.id}, page=${pageResultDTO.page},
+                        type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}" th:text="${dto.title}">
+                            title
+                            </a>
+                        </p>
                     </td>
                     <td>
                         <p th:text="${dto.price} + 원">price</p>
@@ -182,9 +140,22 @@
 
     </div>
 
-    <div class="pager">
 
-    </div>
+    <a th:if="${pageResultDTO.prev}" th:href="@{/trade/list(page=${pageResultDTO.start - 1},
+    type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">
+        Previous
+    </a>
+
+    <th:block th:class="${pageResultDTO.page == page ? 'active' : ''}" th:each="page: ${pageResultDTO.pageList}">
+        <a th:href="@{/trade/list/(page=${page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">
+            [[${page} ]]
+        </a>
+    </th:block>
+
+    <a th:if="${pageResultDTO.next}" th:href="@{/trade/list(page=${pageResultDTO.end + 1},
+    type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">
+        Next
+    </a>
 
 </body>
 </html>

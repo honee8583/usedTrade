@@ -7,6 +7,7 @@ import com.example.usedTrade.keyword.repository.KeywordRepository;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.page.PageResultDTO;
+import com.example.usedTrade.trade.entity.QTrade;
 import com.example.usedTrade.trade.entity.Trade;
 import com.example.usedTrade.trade.entity.TradeImage;
 import com.example.usedTrade.trade.entity.TradeStatus;
@@ -16,10 +17,13 @@ import com.example.usedTrade.trade.repository.TradeImageRepository;
 import com.example.usedTrade.trade.repository.TradeRepository;
 import com.example.usedTrade.trade.service.TradeImageService;
 import com.example.usedTrade.trade.service.TradeService;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -61,7 +65,6 @@ public class TradeServiceImpl implements TradeService {
 
         tradeRepository.save(trade);
 
-//        for(MultipartFile file: multipartFileList) {
         for (int i = 0; i < multipartFileList.size(); i++) {
             if (StringUtils.hasText(multipartFileList.get(i).getOriginalFilename())) {
                 TradeImage tradeImage = TradeImage.builder()
@@ -86,8 +89,17 @@ public class TradeServiceImpl implements TradeService {
 
     @Override
     public void delete(long tradeId) {
+        // 거래글 삭제
         findTrade(tradeId);
         tradeRepository.deleteById(tradeId);
+
+        // 이미지 삭제
+        List<TradeImage> tradeImageList =
+                tradeImageRepository.findByTradeIdOrderByIdAsc(tradeId);
+
+        for (TradeImage tradeImage : tradeImageList) {
+            tradeImageRepository.deleteById(tradeImage.getId());
+        }
     }
 
     @Override
@@ -110,27 +122,19 @@ public class TradeServiceImpl implements TradeService {
     @Override
     @Transactional(readOnly = true)
     public PageResultDTO<TradeDto, Trade> getTradeList(PageRequestDTO pageRequestDTO) {
-        Pageable pageable = pageRequestDTO.getPageable();
+        Pageable pageable =
+                pageRequestDTO.getPageable(Sort.by("regDt").descending());
 
-        Page<Trade> tradeList = tradeRepository.findAllByOrderByRegDtDesc(pageable);
+        BooleanBuilder booleanBuilder = getSearch(pageRequestDTO);
+
+        Page<Trade> tradeList = tradeRepository.findAll(booleanBuilder, pageable);
 
         Function<Trade, TradeDto> fn = TradeDto::entityToDto;
 
         int totalTradeCount = (int) tradeRepository.countAll();
 
-        PageResultDTO<TradeDto, Trade> pageResultDTO = new PageResultDTO<>(tradeList, fn);
-
-        int size = pageResultDTO.getSize();
-        int page = pageResultDTO.getPage();
-        int elements = pageResultDTO.getDtoList().size();
-
-        int idx = 0;
-        for (int i = totalTradeCount - (page - 1) * size; i > totalTradeCount - size * page; i--) {
-            pageResultDTO.getDtoList().get(idx++).setIdx(i);
-            if (i <= 1) {
-                break;
-            }
-        }
+        PageResultDTO<TradeDto, Trade> pageResultDTO
+                = new PageResultDTO<>(tradeList, fn);
 
         return pageResultDTO;
     }
@@ -138,5 +142,33 @@ public class TradeServiceImpl implements TradeService {
     private Trade findTrade(long tradeId) {
         return tradeRepository.findById(tradeId)
                 .orElseThrow(TradeNotFoundException::new);
+    }
+
+    private BooleanBuilder getSearch(PageRequestDTO pageRequestDTO) {
+        String type = pageRequestDTO.getType();
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QTrade qTrade = QTrade.trade;
+
+        String keyword = pageRequestDTO.getKeyword();;
+
+        if (type == null || type.trim().length() == 0) {
+            return booleanBuilder;
+        }
+
+        if (type.contains("t")) {   // title
+            booleanBuilder.or(qTrade.title.contains(keyword));
+        }
+        if (type.contains("c")) {   // content
+            booleanBuilder.or(qTrade.content.contains(keyword));
+        }
+        if (type.contains("e")) {   // email
+            booleanBuilder.or(qTrade.member.email.contains(keyword));
+        }
+        if (type.contains("k")) {   // keyword
+            booleanBuilder.or(qTrade.keywordList.contains(keyword));
+        }
+
+        return booleanBuilder;
     }
 }

@@ -46,8 +46,8 @@
     </div>
 
     <div>
-        <button th:if="${tradeDto.email == username}" th:onclick="|location.href='@{/trade/modify(tradeId=${tradeDto.id})}'|"> 수정 </button>
-        <button th:onclick="|location.href='@{/trade/list}'|"> 목록 </button>
+        <button th:if="${tradeDto.email == username}" th:onclick="|location.href='@{/trade/modify(tradeId=${tradeDto.id}, page=${pageRequestDTO.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}'|"> 수정 </button>
+        <button th:onclick="|location.href='@{/trade/list(page=${pageRequestDTO.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}'|"> 목록 </button>
     </div>
 
 </body>

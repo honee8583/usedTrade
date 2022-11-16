@@ -20,8 +20,6 @@ import java.util.List;
 public class TradeDto {
     private Long id;
 
-    private long idx;
-
     private String email;
 
     @NotBlank(message = "제목은 필수 입력 사항입니다.")

@@ -12,11 +12,9 @@ import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -71,7 +69,9 @@ public class TradeController {
     }
 
     @GetMapping("/list")
-    public String getList(Model model, PageRequestDTO pageRequestDTO) {
+    public String getList(Model model,
+                          @ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO) {
+
         log.info("list PageRequestDto: " + pageRequestDTO.toString());
 
         PageResultDTO pageResultDTO =
@@ -83,8 +83,11 @@ public class TradeController {
     }
 
     @GetMapping("/detail")
-    public String detail(Model model, long tradeId, Principal principal) {
-        log.info("detail : " + tradeId);
+    public String detail(Model model,
+                         @ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO,
+                         long tradeId, Principal principal) {
+
+        log.info("detail : " + tradeId + "pageRequestDTO: " + pageRequestDTO);
 
         try{
             TradeDto tradeDto = tradeService.getTrade(tradeId);
@@ -101,7 +104,9 @@ public class TradeController {
     }
 
     @GetMapping("/modify")
-    public String modify(Model model, long tradeId) {
+    public String modify(Model model, long tradeId,
+                         @ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO) {
+
         log.info("modifying : " + tradeId);
 
         try{
@@ -118,7 +123,9 @@ public class TradeController {
     @PostMapping("/modify")
     public String modifySubmit(Model model, @Valid TradeDto tradeDto,
                                BindingResult bindingResult,
-                               @RequestParam("tradeImgFile") List<MultipartFile> multipartFileList) {
+                               @RequestParam("tradeImgFile") List<MultipartFile> multipartFileList,
+                               @ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO,
+                               RedirectAttributes redirectAttributes) {
 
         log.info("trade modifySubmit: " + tradeDto);
 
@@ -133,12 +140,16 @@ public class TradeController {
 
         try{
             tradeService.modify(tradeDto, multipartFileList);
+            redirectAttributes.addAttribute("tradeId", tradeDto.getId());
+            redirectAttributes.addAttribute("page", pageRequestDTO.getPage());
+            redirectAttributes.addAttribute("type", pageRequestDTO.getType());
+            redirectAttributes.addAttribute("keyword", pageRequestDTO.getKeyword());
         } catch (Exception e) {
             model.addAttribute("errorMessage", "수정 중 에러가 발생하였습니다.");
             return "trade/register";
         }
 
-        return "redirect:/trade/detail?tradeId=" + tradeDto.getId();
+        return "redirect:/trade/detail";
     }
 
     @PostMapping("/delete")

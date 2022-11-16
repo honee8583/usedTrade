@@ -79,6 +79,10 @@
         <input type="hidden" th:name="tradeId" th:value="${tradeDto.id}"/>
         <input type="hidden" th:name="id" th:value="${tradeDto.id}"/>
 
+        <input type="hidden" th:name="page" th:value="${pageRequestDTO.page}"/>
+        <input type="hidden" th:name="type" th:value="${pageRequestDTO.type}"/>
+        <input type="hidden" th:name="keyword" th:value="${pageRequestDTO.keyword}"/>
+
         <div>
             제목: <input type="text" th:field="*{title}" placeholder="제목 입력"/>
             <p class="errorMessage" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Incorrect Data</p>
