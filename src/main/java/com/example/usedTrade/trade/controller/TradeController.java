@@ -1,5 +1,6 @@
 package com.example.usedTrade.trade.controller;
 
+import com.example.usedTrade.error.AbstractException;
 import com.example.usedTrade.keyword.service.KeywordService;
 import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.page.PageResultDTO;
@@ -7,15 +8,19 @@ import com.example.usedTrade.trade.model.TradeDto;
 import com.example.usedTrade.trade.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -40,6 +45,7 @@ public class TradeController {
     @PostMapping("/register")
     public String registerSubmit(Model model, @Valid TradeDto tradeDto,
                                  BindingResult bindingResult,
+                                 @RequestParam("tradeImgFile") List<MultipartFile> multipartFileList,
                                  Principal principal) {
 
         log.info("Trade registerSubmit: " + tradeDto);
@@ -48,10 +54,15 @@ public class TradeController {
             return "trade/register";
         }
 
+        if (multipartFileList.get(0).isEmpty() && tradeDto.getId() == null) {
+            model.addAttribute("errorMessage", "첫번째 상품 이미지는 필수 입력값입니다.");
+            return "trade/register";
+        }
+
         try {
             tradeDto.setEmail(principal.getName());
-            tradeService.register(tradeDto);
-        } catch (IllegalStateException e) {
+            tradeService.register(tradeDto, multipartFileList);
+        } catch (Exception e) {
             model.addAttribute("message", e.getMessage());
             return "trade/register";
         }
@@ -75,9 +86,16 @@ public class TradeController {
     public String detail(Model model, long tradeId, Principal principal) {
         log.info("detail : " + tradeId);
 
-        TradeDto tradeDto = tradeService.getTrade(tradeId);
-        model.addAttribute("tradeDto", tradeDto);
-        model.addAttribute("username" , principal.getName());
+        try{
+            TradeDto tradeDto = tradeService.getTrade(tradeId);
+            log.info(tradeDto.toString());
+            model.addAttribute("tradeDto", tradeDto);
+            model.addAttribute("username" , principal.getName());
+        } catch(AbstractException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("tradeDto", new TradeDto());
+            return "trade/list";
+        }
 
         return "trade/detail";
     }
@@ -86,18 +104,39 @@ public class TradeController {
     public String modify(Model model, long tradeId) {
         log.info("modifying : " + tradeId);
 
-        TradeDto tradeDto = tradeService.getTrade(tradeId);
-        model.addAttribute("tradeDto", tradeDto);
+        try{
+            TradeDto tradeDto = tradeService.getTrade(tradeId);
+            model.addAttribute("tradeDto", tradeDto);
+        } catch (AbstractException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "trade/list";
+        }
 
         return "trade/register";
     }
 
     @PostMapping("/modify")
-    public String modifySubmit(@Valid TradeDto tradeDto) {
+    public String modifySubmit(Model model, @Valid TradeDto tradeDto,
+                               BindingResult bindingResult,
+                               @RequestParam("tradeImgFile") List<MultipartFile> multipartFileList) {
 
         log.info("trade modifySubmit: " + tradeDto);
 
-        tradeService.modify(tradeDto.getId(), tradeDto);
+        if (bindingResult.hasErrors()) {
+            return "trade/register";
+        }
+
+        if (multipartFileList.get(0).isEmpty() && tradeDto.getId() == null) {
+            model.addAttribute("errorMessage", "첫번째 상품 이미지는 필수 입력값입니다.");
+            return "trade/register";
+        }
+
+        try{
+            tradeService.modify(tradeDto, multipartFileList);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "수정 중 에러가 발생하였습니다.");
+            return "trade/register";
+        }
 
         return "redirect:/trade/detail?tradeId=" + tradeDto.getId();
     }

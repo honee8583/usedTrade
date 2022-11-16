@@ -41,6 +41,10 @@ public class TradeDto {
     @NotNull(message = "키워드는 필수 입력 사항입니다.")
     private List<String> keywordList;
 
+    private List<TradeImgDto> tradeImgDtoList = new ArrayList<>();
+
+    private List<Long> tradeImgIds = new ArrayList<>();
+
     private LocalDateTime regDt;
 
     private LocalDateTime upDt;

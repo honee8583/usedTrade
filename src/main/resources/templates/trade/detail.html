@@ -39,6 +39,10 @@
         <p th:text="'키워드: ' + ${tradeDto.keywordList}">keywordList</p>
         <p th:text="'판매여부: ' + ${tradeDto.tradeStatus}">tradeStatus</p>
         <p th:text="'작성일: ' + ${tradeDto.regDt}">regDt</p>
+
+        <div th:each="imgDto: ${tradeDto.tradeImgDtoList}">
+            <img th:src="${imgDto.imgUrl}">
+        </div>
     </div>
 
     <div>

@@ -8,9 +8,13 @@ import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.page.PageResultDTO;
 import com.example.usedTrade.trade.entity.Trade;
+import com.example.usedTrade.trade.entity.TradeImage;
 import com.example.usedTrade.trade.entity.TradeStatus;
 import com.example.usedTrade.trade.model.TradeDto;
+import com.example.usedTrade.trade.model.TradeImgDto;
+import com.example.usedTrade.trade.repository.TradeImageRepository;
 import com.example.usedTrade.trade.repository.TradeRepository;
+import com.example.usedTrade.trade.service.TradeImageService;
 import com.example.usedTrade.trade.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +22,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,8 +39,11 @@ public class TradeServiceImpl implements TradeService {
     private final TradeRepository tradeRepository;
     private final KeywordRepository keywordRepository;
 
+    private final TradeImageService tradeImageService;
+    private final TradeImageRepository tradeImageRepository;
+
     @Override
-    public void register(TradeDto tradeDto) {
+    public void register(TradeDto tradeDto, List<MultipartFile> multipartFileList) throws Exception {
         Trade trade = Trade.builder()
                 .member(Member.builder().email(tradeDto.getEmail()).build())
                 .title(tradeDto.getTitle())
@@ -41,20 +53,35 @@ public class TradeServiceImpl implements TradeService {
                 .regDt(LocalDateTime.now())
                 .build();
 
-        for (String s: tradeDto.getKeywordList()) {
+        for (String s : tradeDto.getKeywordList()) {
             Keyword keyword = keywordRepository.findByKeywordName(s)
-                            .orElseThrow(KeywordNotFoundException::new);
+                    .orElseThrow(KeywordNotFoundException::new);
             trade.addKeyword(s);
         }
 
         tradeRepository.save(trade);
+
+//        for(MultipartFile file: multipartFileList) {
+        for (int i = 0; i < multipartFileList.size(); i++) {
+            if (StringUtils.hasText(multipartFileList.get(i).getOriginalFilename())) {
+                TradeImage tradeImage = TradeImage.builder()
+                        .trade(trade)
+                        .build();
+                tradeImageService.saveTradeImage(tradeImage, multipartFileList.get(i));
+            }
+        }
     }
 
     @Override
-    public void modify(long tradeId, TradeDto tradeDto) {
-        Trade trade = findTrade(tradeId);
+    public void modify(TradeDto tradeDto, List<MultipartFile> multipartFileList) throws Exception {
+        Trade trade = findTrade(tradeDto.getId());
         trade.modifyTrade(tradeDto);
         tradeRepository.save(trade);
+
+        List<Long> tradeImageIds = tradeDto.getTradeImgIds();
+        for (int i = 0;i< multipartFileList.size(); i++) {
+            tradeImageService.updateTradeImage(tradeImageIds.get(i), multipartFileList.get(i));
+        }
     }
 
     @Override
@@ -66,9 +93,18 @@ public class TradeServiceImpl implements TradeService {
     @Override
     @Transactional(readOnly = true)
     public TradeDto getTrade(long tradeId) {
+        List<TradeImage> tradeImageList =
+                tradeImageRepository.findByTradeIdOrderByIdAsc(tradeId);
+
+        List<TradeImgDto> tradeImgDtoList = tradeImageList.stream()
+                .map(TradeImgDto::entityToDto).collect(Collectors.toList());
+
         Trade trade = findTrade(tradeId);
 
-        return TradeDto.entityToDto(trade);
+        TradeDto tradeDto = TradeDto.entityToDto(trade);
+        tradeDto.setTradeImgDtoList(tradeImgDtoList);
+
+        return tradeDto;
     }
 
     @Override
