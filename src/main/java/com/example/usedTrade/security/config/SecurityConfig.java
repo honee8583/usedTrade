@@ -36,14 +36,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
         http.csrf().disable();
 
-        // jwt
-//        http.httpBasic().disable()  // 세션 방식 사용x
-//                .csrf().disable()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                    .addFilter(jwtAuthorizationFilter)   //formLogin().disable()때문에 동작하지 않는
-//                    .addFilter(jwtAuthenticationFilter);
-
         http.authorizeRequests()
                 .antMatchers("/", "/member/**").permitAll()
                 .antMatchers("/trade/**").authenticated();

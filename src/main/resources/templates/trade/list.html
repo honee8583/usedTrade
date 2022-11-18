@@ -11,10 +11,6 @@
         .list table th, .list table td {
             border: solid 1px #000;
         }
-        .list .buttons {
-            position: relative;
-            padding: 10px 0;
-        }
         .list .buttons a, .list .buttons button {
             border-width: 0;
             background-color: transparent;
@@ -25,23 +21,8 @@
             color: #000;
             cursor: pointer;
         }
-        .list .buttons .total-count {
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-        p.nothing {
-            text-align: center;
-            padding: 100px;
-        }
-        .pager {
-            margin-top: 20px;
-            text-align: center;
-        }
-        <!-- 현재 페이지 활성화 -->
-        .pager a.on {
-            font-weight: bold;
-            color: red;
+        .orderByPriceDiv {
+            float: right;
         }
     </style>
 
@@ -52,12 +33,38 @@
     <script th:inline="javascript">
         $(document).ready(function() {
 
+            $.ajax({
+                url: "/api/keyword",
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function(keywordList) {
+                    console.log(keywordList);
+
+                    var str = "";
+                    $.each(keywordList, function (index, keywordDto) {
+                        console.log(keywordDto);
+                        str += "<a href='/trade/list?page=1&type=k&keyword=" + keywordDto.keywordName + "'>"
+                            + keywordDto.keywordName + "</a>    ";
+                    });
+
+                    // 키워드 별로 페이지 출력 링크
+                    $('#keywordList').html(str);
+
+                },error: function(error) {
+                    alert("키워드를 불러오는데 실패했습니다.");
+                    console.log(error.responseJSON);
+                }
+            });
+
            var searchForm = $("#searchForm");
 
+           // 검색 폼 submit
            $('.btn-search').click(function(e) {
                searchForm.submit();
            });
 
+           // 검색 폼의 내용을 초기화 하고 submit
            $('.btn-clear').click(function(e) {
                searchForm.empty().submit();
            });
@@ -77,7 +84,8 @@
 
     <form action="/trade/list" method="get" id="searchForm">
         <input type="hidden" name="page" value="1"/>    <!--기본 1페이지-->
-        <div>
+
+        <div class="typeDiv">
             <select name="type">
                 <option th:selected="${pageRequestDTO.type == null}">-------</option>
                 <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
@@ -89,14 +97,29 @@
                 <option value="tce" th:selected="${pageRequestDTO.type == 'tce'}">제목 + 내용 + 작성자</option>
             </select>
         </div>
+
         <input name="keyword" th:value="${pageRequestDTO.keyword}">
+
+        <div class="orderByPriceDiv">
+            <select name="order">
+                <option th:selected="${pageRequestDTO.order == null}">-------</option>
+                <option value="DESC" th:selected="${pageRequestDTO.order == 'DESC'}">가격 높은 순</option>
+                <option value="ASC" th:selected="${pageRequestDTO.order == 'ASC'}">가격 낮은 순</option>
+            </select>
+        </div>
+
         <div>
             <button class="btn-search" type="button">Search</button>
             <button class="btn-clear" type="button">Clear</button>
         </div>
+
     </form>
 
     <hr/>
+
+    <div id="keywordList">
+
+    </div>
 
     <div class="list">
         <table>
@@ -131,8 +154,7 @@
                         <p th:text="${dto.email}">register email</p>
                     </td>
                     <td>
-                        <!-- TODO <p th:text="${#dates.format(dto.regDt, 'yyyy/MM/dd HH:mm:ss')}">regDt</p>-->
-                        <p th:text="${dto.regDt}">regDt</p>
+                        <p th:text="${#temporals.format(dto.regDt, 'yyyy-MM-dd HH:mm')}">regDt</p>
                     </td>
                 </tr>
             </tbody>

@@ -7,10 +7,7 @@ import com.example.usedTrade.keyword.repository.KeywordRepository;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.page.PageResultDTO;
-import com.example.usedTrade.trade.entity.QTrade;
-import com.example.usedTrade.trade.entity.Trade;
-import com.example.usedTrade.trade.entity.TradeImage;
-import com.example.usedTrade.trade.entity.TradeStatus;
+import com.example.usedTrade.trade.entity.*;
 import com.example.usedTrade.trade.model.TradeDto;
 import com.example.usedTrade.trade.model.TradeImgDto;
 import com.example.usedTrade.trade.repository.TradeImageRepository;
@@ -21,9 +18,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -47,7 +42,9 @@ public class TradeServiceImpl implements TradeService {
     private final TradeImageRepository tradeImageRepository;
 
     @Override
+    @Transactional
     public void register(TradeDto tradeDto, List<MultipartFile> multipartFileList) throws Exception {
+        // 게시글 등록
         Trade trade = Trade.builder()
                 .member(Member.builder().email(tradeDto.getEmail()).build())
                 .title(tradeDto.getTitle())
@@ -65,40 +62,12 @@ public class TradeServiceImpl implements TradeService {
 
         tradeRepository.save(trade);
 
+        // 게시글 이미지 등록
         for (int i = 0; i < multipartFileList.size(); i++) {
-            if (StringUtils.hasText(multipartFileList.get(i).getOriginalFilename())) {
-                TradeImage tradeImage = TradeImage.builder()
-                        .trade(trade)
-                        .build();
-                tradeImageService.saveTradeImage(tradeImage, multipartFileList.get(i));
-            }
-        }
-    }
-
-    @Override
-    public void modify(TradeDto tradeDto, List<MultipartFile> multipartFileList) throws Exception {
-        Trade trade = findTrade(tradeDto.getId());
-        trade.modifyTrade(tradeDto);
-        tradeRepository.save(trade);
-
-        List<Long> tradeImageIds = tradeDto.getTradeImgIds();
-        for (int i = 0;i< multipartFileList.size(); i++) {
-            tradeImageService.updateTradeImage(tradeImageIds.get(i), multipartFileList.get(i));
-        }
-    }
-
-    @Override
-    public void delete(long tradeId) {
-        // 거래글 삭제
-        findTrade(tradeId);
-        tradeRepository.deleteById(tradeId);
-
-        // 이미지 삭제
-        List<TradeImage> tradeImageList =
-                tradeImageRepository.findByTradeIdOrderByIdAsc(tradeId);
-
-        for (TradeImage tradeImage : tradeImageList) {
-            tradeImageRepository.deleteById(tradeImage.getId());
+            TradeImage tradeImage = TradeImage.builder()
+                                    .trade(trade)
+                                    .build();
+            tradeImageService.saveTradeImage(tradeImage, multipartFileList.get(i));
         }
     }
 
@@ -122,8 +91,10 @@ public class TradeServiceImpl implements TradeService {
     @Override
     @Transactional(readOnly = true)
     public PageResultDTO<TradeDto, Trade> getTradeList(PageRequestDTO pageRequestDTO) {
-        Pageable pageable =
-                pageRequestDTO.getPageable(Sort.by("regDt").descending());
+
+        Sort sort = getSort(PriceOrder.valueOf(pageRequestDTO.getOrder()));
+
+        Pageable pageable = pageRequestDTO.getPageable(sort);
 
         BooleanBuilder booleanBuilder = getSearch(pageRequestDTO);
 
@@ -131,12 +102,39 @@ public class TradeServiceImpl implements TradeService {
 
         Function<Trade, TradeDto> fn = TradeDto::entityToDto;
 
-        int totalTradeCount = (int) tradeRepository.countAll();
-
         PageResultDTO<TradeDto, Trade> pageResultDTO
                 = new PageResultDTO<>(tradeList, fn);
 
         return pageResultDTO;
+    }
+
+    @Override
+    @Transactional
+    public void modify(TradeDto tradeDto, List<MultipartFile> multipartFileList) throws Exception {
+        Trade trade = findTrade(tradeDto.getId());
+        trade.modifyTrade(tradeDto);
+        tradeRepository.save(trade);
+
+        List<Long> tradeImageIds = tradeDto.getTradeImgIds();
+        for (int i = 0;i< multipartFileList.size(); i++) {
+            tradeImageService.updateTradeImage(tradeImageIds.get(i), multipartFileList.get(i));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(long tradeId) {
+        // 이미지 삭제
+        List<TradeImage> tradeImageList =
+                tradeImageRepository.findByTradeIdOrderByIdAsc(tradeId);
+
+        for (TradeImage tradeImage : tradeImageList) {
+            tradeImageRepository.deleteById(tradeImage.getId());
+        }
+
+        // 거래글 삭제
+        findTrade(tradeId);
+        tradeRepository.deleteById(tradeId);
     }
 
     private Trade findTrade(long tradeId) {
@@ -170,5 +168,16 @@ public class TradeServiceImpl implements TradeService {
         }
 
         return booleanBuilder;
+    }
+
+    private Sort getSort(PriceOrder order) {
+        if (order == null) {
+            return Sort.by("regDt").descending();
+        } else if (order == PriceOrder.DESC) {
+            return Sort.by("price").descending();
+        } else if (order == PriceOrder.ASC) {
+            return Sort.by("price").ascending();
+        }
+        return null;
     }
 }

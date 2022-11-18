@@ -15,6 +15,13 @@
     <script th:inline="javascript">
         $(document).ready(function () {
 
+            var errorMessage = [[${errorMessage}]];
+            if (errorMessage != null) {
+                alert(errorMessage);
+            }
+
+            fileUpload();
+
             // 키워드 리스트 불러오기
             $.ajax({
                 url: "/api/keyword",
@@ -29,8 +36,6 @@
                         str += "<label><input type='checkbox' name='keywordList' value='" + keyword.keywordName + "'/>"
                             + keyword.keywordName + "</label>";
                     });
-                    // str += "<p class=\"errorMessage\" th:if=\"${#fields.hasErrors('keywordList')}\" "
-                    //     + "th:errors=\"*{keywordList}\">Incorrect Data</p>"
 
                     $('#keywordListDiv').html(str);
 
@@ -47,11 +52,20 @@
                 }
             });
 
-            fileUpload();
+            var submitForm = $("#submitForm");
 
+            $("#modifyBtn").click(function(e) {
+                submitForm.attr("action", "/trade/modify");
+                submitForm.submit();
+            });
+
+            $("#deleteBtn").click(function(e) {
+                $("#submitForm").attr("action", "/trade/delete");
+                submitForm.submit();
+            });
         });
 
-        // 첨부파일 업로드
+        // 첨부파일 이미지 파일 검사
         function fileUpload() {
             $(".custom-file-input").on("change", function () {
                 var fileName = $(this).val().split("\\").pop(); // 이미지 파일명
@@ -75,13 +89,9 @@
     <h1> 거래글 작성 </h1>
     <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
 
-    <form role="form" action="/trade/register" enctype="multipart/form-data" method="post" th:object="${tradeDto}">
+    <form id="submitForm" role="form" action="/trade/register" enctype="multipart/form-data" method="post" th:object="${tradeDto}">
         <input type="hidden" th:name="tradeId" th:value="${tradeDto.id}"/>
         <input type="hidden" th:name="id" th:value="${tradeDto.id}"/>
-
-        <input type="hidden" th:name="page" th:value="${pageRequestDTO.page}"/>
-        <input type="hidden" th:name="type" th:value="${pageRequestDTO.type}"/>
-        <input type="hidden" th:name="keyword" th:value="${pageRequestDTO.keyword}"/>
 
         <div>
             제목: <input type="text" th:field="*{title}" placeholder="제목 입력"/>
@@ -140,12 +150,15 @@
         </div>
 
         <div th:if="${#strings.isEmpty(tradeDto.id)}">
-            <button th:formaction="@{/trade/register}" type="submit"> 저장 </button>
+            <button type="submit"> 저장 </button>
         </div>
 
         <div th:unless="${#strings.isEmpty(tradeDto.id)}">
-            <button th:formaction="@{/trade/modify(tradeId=${tradeDto.id})}" type="submit"> 수정 </button>
-            <button th:formaction="@{/trade/delete}" type="submit"> 삭제 </button>
+<!--            <button th:formaction="@{/trade/modify(tradeId=${tradeDto.id})}" type="submit"> 수정 </button>-->
+<!--            <button th:formaction="@{/trade/delete}" type="submit"> 삭제 </button>-->
+
+            <button id="modifyBtn" type="button"> 수정 </button>
+            <button id="deleteBtn" type="button"> 삭제 </button>
         </div>
 
     </form>

@@ -1,5 +1,6 @@
 package com.example.usedTrade.page;
 
+import com.example.usedTrade.trade.entity.PriceOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,9 @@ public class PageRequestDTO {   //화면페이지에서 요청하는 데이터�
     // search
     private String type;
     private String keyword;
+
+    // order
+    private String order;
 
     public PageRequestDTO(){
         this.page = 1;

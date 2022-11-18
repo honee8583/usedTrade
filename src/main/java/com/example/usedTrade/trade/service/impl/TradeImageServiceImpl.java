@@ -16,25 +16,26 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class TradeImageServiceImpl implements TradeImageService {
 
-    @Value("${tradeImgLocation}")
-    private String tradeImgLocation;
-
     private final TradeImageRepository tradeImageRepository;
-
     private final FileService fileService;
 
     @Override
-    public void saveTradeImage(TradeImage tradeImage, MultipartFile multipartFile) throws Exception {
+    public void saveTradeImage(TradeImage tradeImage, MultipartFile multipartFile)
+            throws Exception {
+
         String originalImageName = multipartFile.getOriginalFilename();
         String imgName = "";
         String imgUrl = "";
 
         // 파일 업로드
         if (!StringUtils.isEmpty(originalImageName)) {
-            log.info(originalImageName);
-            imgName = fileService.uploadFile(tradeImgLocation, originalImageName, multipartFile.getBytes());
-            imgUrl = "/images/trade/" + imgName;
+            imgName = fileService.uploadFile(originalImageName, multipartFile.getBytes());
+            imgUrl = "/images/trade/" + imgName; // TODO
         }
+
+        log.info("originalImageName: " + originalImageName);
+        log.info("imgName: " + imgName);
+        log.info("imgUrl : " + imgUrl);
 
         tradeImage.updateTradeImg(originalImageName, imgName, imgUrl);
         tradeImageRepository.save(tradeImage);
@@ -48,13 +49,14 @@ public class TradeImageServiceImpl implements TradeImageService {
 
             // 파일 삭제
             if (!StringUtils.isEmpty(savedTradeImage.getImgName())) {
-                fileService.deleteFile(tradeImgLocation + "/" + savedTradeImage.getImgName());
+                fileService.deleteFile("/" + savedTradeImage.getImgName());
             }
 
             // 파일 새로 업로드
             String oriImgName = multipartFile.getOriginalFilename();
+
             String imgName =
-                    fileService.uploadFile(tradeImgLocation, oriImgName, multipartFile.getBytes());
+                    fileService.uploadFile(oriImgName, multipartFile.getBytes());
             String imgUrl = "/images/trade/" + imgName;
             savedTradeImage.updateTradeImg(oriImgName, imgName, imgUrl);
 

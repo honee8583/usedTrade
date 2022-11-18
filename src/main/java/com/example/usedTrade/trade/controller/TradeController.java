@@ -61,7 +61,7 @@ public class TradeController {
             tradeDto.setEmail(principal.getName());
             tradeService.register(tradeDto, multipartFileList);
         } catch (Exception e) {
-            model.addAttribute("message", e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
             return "trade/register";
         }
 
@@ -69,8 +69,7 @@ public class TradeController {
     }
 
     @GetMapping("/list")
-    public String getList(Model model,
-                          @ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO) {
+    public String getList(Model model, PageRequestDTO pageRequestDTO) {
 
         log.info("list PageRequestDto: " + pageRequestDTO.toString());
 
