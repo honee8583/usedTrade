@@ -92,7 +92,7 @@ public class TradeServiceImpl implements TradeService {
     @Transactional(readOnly = true)
     public PageResultDTO<TradeDto, Trade> getTradeList(PageRequestDTO pageRequestDTO) {
 
-        Sort sort = getSort(PriceOrder.valueOf(pageRequestDTO.getOrder()));
+        Sort sort = getSort(pageRequestDTO.getOrder());
 
         Pageable pageable = pageRequestDTO.getPageable(sort);
 
@@ -170,12 +170,12 @@ public class TradeServiceImpl implements TradeService {
         return booleanBuilder;
     }
 
-    private Sort getSort(PriceOrder order) {
-        if (order == null) {
+    private Sort getSort(String order) {
+        if (order == null || order == "" || order.trim().length() == 0) {
             return Sort.by("regDt").descending();
-        } else if (order == PriceOrder.DESC) {
+        } else if (PriceOrder.valueOf(order) == PriceOrder.DESC) {
             return Sort.by("price").descending();
-        } else if (order == PriceOrder.ASC) {
+        } else if (PriceOrder.valueOf(order) == PriceOrder.ASC) {
             return Sort.by("price").ascending();
         }
         return null;
