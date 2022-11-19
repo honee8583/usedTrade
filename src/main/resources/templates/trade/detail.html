@@ -29,7 +29,9 @@
         $(document).ready(function () {
 
             var tradeId = [[${tradeDto.id}]];
-            console.log(tradeId);
+            var username = [[${#authentication.name}]];
+
+            getInterest(tradeId);
 
             // 좋아요 정보 불러오기
             function getInterest(tradeId) {
@@ -38,7 +40,6 @@
                     method: 'get',
                     dataType: 'json',
                     success: function(result) {
-                        console.log("get interest info result: " + result);
 
                         var str = "";
                         if (result) {
@@ -48,14 +49,13 @@
                         }
 
                         $("#interestDiv").html(str);
+
                     }, error: function(error) {
-                        alert("좋아요 정보를 불러오지 못했습니다\n" + error.message);
+                        alert("좋아요 정보를 불러오지 못했습니다\n" + error);
                         console.log(error);
                     }
                 });
             }
-
-            getInterest(tradeId);
 
             // 좋아요 등록
             $(document).on("click", ".interestFalse", function() {
@@ -68,7 +68,7 @@
                         alert('좋아요를 등록했습니다.');
                         getInterest(tradeId);
                     }, error: function(error) {
-                        alert("좋아요 등록에 실패하였습니다.\n" + error.message);
+                        alert("좋아요 등록에 실패하였습니다.\n" + error);
                     }
                 });
 
@@ -85,11 +85,119 @@
                         alert('좋아요를 해제했습니다.');
                         getInterest(tradeId);
                     }, error: function(error) {
-                        alert("좋아요 해제에 실패하였습니다.\n" + error.message);
+                        alert("좋아요 해제에 실패하였습니다.\n" + error);
                     }
                 });
 
-            })
+            });
+
+            getReplies();
+
+            // 댓글 목록 조회
+            function getReplies() {
+                $.ajax({
+                    url: '/api/reply/' + tradeId,
+                    method: 'get',
+                    dataType: 'json',
+                    success: function(replyDtoList) {
+
+                        // 댓글 목록
+                        var str = "";
+                        $.each(replyDtoList, function(index, replyDto) {
+                            str += "<div>";
+                            str += "<input class='replyId' type='hidden' value='" + replyDto.id + "'/>";
+                            str += "<p>[reply  " + (index + 1) + "]</p>";
+                            str += "<p>replyer: " + replyDto.email + "</p>";
+                            str += "reply: <input type='text' class='replyContent' value='" + replyDto.content + "'/>";
+                            str += "<p>" + replyDto.regDt + "</p>";
+                            if (replyDto.email === username) {
+                                str += "<button type='button' id='replyModifyBtn'> 수정 </button>";
+                                str += "<button type='button' id='replyRemoveBtn'> 삭제 </button>";
+                            }
+                            str += "<p>----------------------------------------------------</p>";
+                            str += "</div>";
+                        });
+
+                        $("#replyListDiv").html(str);
+
+                    }, error: function(error) {
+                        alert('댓글 목록 조회에 실패하였습니다.\n' + error);
+                    }
+                });
+            }
+
+            // 댓글 작성
+            $("#writeBtn").click(function() {
+                var content = $("#replyWriteTextArea").val();
+
+                // tradeId, content
+                var reply = {
+                    trade_id : tradeId,
+                    content: content
+                }
+                console.log("reply: " + reply.trade_id + reply.content);
+
+                $.ajax({
+                    url: '/api/reply',
+                    method: 'post',
+                    data: JSON.stringify(reply),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(result) {
+                        alert('댓글 등록에 성공하였습니다.');
+                        console.log(result);
+                        getReplies();   // 갱신
+                    }, error: function(error) {
+                        alert('댓글 등록에 실패하였습니다.');
+                        console.log(error);
+                    }
+                });
+            });
+
+            // 댓글 수정
+            $(document).on("click", "#replyModifyBtn", function() {
+                var content = $(this).siblings('.replyContent').val();    // 댓글 내용
+                var replyId = $(this).siblings("input[class='replyId']").val();
+
+                var data = {
+                    content: content,
+                    email: username
+                }
+
+                $.ajax({
+                    url: '/api/reply/' + replyId,
+                    method: 'post',
+                    data : JSON.stringify(data),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(data) {
+                        alert('댓글 수정에 성공하였습니다.');
+                        console.log(data);
+                        getReplies();
+                    }, error: function(error) {
+                        alert('댓글 수정에 실패하였습니다.');
+                        console.log(error);
+                    }
+                });
+
+            });
+
+            // 댓글 삭제
+            $(document).on("click", "#replyRemoveBtn", function() {
+                var replyId = $(this).siblings("input[class='replyId']").val();
+
+                $.ajax({
+                    url: '/api/reply/' + replyId,
+                    method: 'delete',
+                    success: function(data) {
+                        alert('댓글 삭제에 성공하였습니다.');
+                        console.log(data);
+                        getReplies();
+                    }, error: function(error) {
+                        alert('댓글 삭제에 실패하였습니다.');
+                        console.log(error);
+                    }
+                });
+
+            });
 
         });
     </script>
@@ -110,14 +218,25 @@
         <div th:each="imgDto: ${tradeDto.tradeImgDtoList}">
             <img th:src="${imgDto.getUrl()}">
         </div>
-        <div id="interestDiv">
-
-        </div>
     </div>
 
-    <div>
-        <button th:if="${tradeDto.email == username}" th:onclick="|location.href='@{/trade/modify(tradeId=${tradeDto.id}, page=${pageRequestDTO.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}'|"> 수정 </button>
+    <div id="interestDiv">
+
+    </div>
+
+    <div id="buttonDiv">
+        <button th:if="${tradeDto.email == username}"
+                th:onclick="|location.href='@{/trade/modify(tradeId=${tradeDto.id}, page=${pageRequestDTO.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}'|"> 수정 </button>
         <button th:onclick="|location.href='@{/trade/list(page=${pageRequestDTO.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}'|"> 목록 </button>
+    </div>
+
+    <div id="replyListDiv">
+
+    </div>
+
+    <div id="replyWriteDiv">
+        <textarea id="replyWriteTextArea"></textarea>
+        <button id="writeBtn"> 등록 </button>
     </div>
 
 </body>

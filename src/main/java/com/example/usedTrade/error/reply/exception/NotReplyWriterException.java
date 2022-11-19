@@ -1,10 +1,10 @@
-package com.example.usedTrade.error.trade.exception;
+package com.example.usedTrade.error.reply.exception;
 
 import com.example.usedTrade.error.AbstractException;
-import com.example.usedTrade.error.trade.TradeError;
+import com.example.usedTrade.error.reply.ReplyError;
 import org.springframework.http.HttpStatus;
 
-public class NotInterestedException extends AbstractException {
+public class NotReplyWriterException extends AbstractException {
     @Override
     public int getStatusCode() {
         return HttpStatus.BAD_REQUEST.value();
@@ -12,6 +12,6 @@ public class NotInterestedException extends AbstractException {
 
     @Override
     public String getMessage() {
-        return TradeError.NOT_INTERESTED_TRADE.getDescription();
+        return ReplyError.NOT_REPLY_WRITER.getDescription();
     }
 }

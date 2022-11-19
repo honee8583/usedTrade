@@ -5,7 +5,6 @@ import com.example.usedTrade.error.trade.exception.NotInterestedException;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.trade.entity.Interest;
 import com.example.usedTrade.trade.entity.Trade;
-import com.example.usedTrade.trade.model.InterestInput;
 import com.example.usedTrade.trade.repository.InterestRepository;
 import com.example.usedTrade.trade.service.impl.InterestServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -35,10 +34,6 @@ class InterestServiceTest {
         // given
         long tradeId = 2L;
         String email = "test@test.com";
-//        InterestInput input = InterestInput.builder()
-//                                .tradeId(tradeId)
-//                                .email(email)
-//                                .build();
 
         Interest interest = Interest.builder()
                 .trade(Trade.builder().id(tradeId).build())
@@ -60,10 +55,6 @@ class InterestServiceTest {
         // given
         long tradeId = 2L;
         String email = "test@test.com";
-//        InterestInput input = InterestInput.builder()
-//                .tradeId(tradeId)
-//                .email(email)
-//                .build();
 
         given(interestRepository.findByTrade_idAndMember_email(anyLong(), anyString()))
                 .willReturn(Optional.empty());
@@ -80,10 +71,6 @@ class InterestServiceTest {
         // given
         long tradeId = 2L;
         String email = "test@test.com";
-//        InterestInput input = InterestInput.builder()
-//                .tradeId(tradeId)
-//                .email(email)
-//                .build();
 
         Interest interest = Interest.builder()
                 .trade(Trade.builder().id(tradeId).build())
@@ -107,10 +94,6 @@ class InterestServiceTest {
         // given
         long tradeId = 2L;
         String email = "test@test.com";
-//        InterestInput input = InterestInput.builder()
-//                .tradeId(tradeId)
-//                .email(email)
-//                .build();
 
         Interest interest = Interest.builder()
                 .trade(Trade.builder().id(tradeId).build())
@@ -132,10 +115,6 @@ class InterestServiceTest {
         // given
         long tradeId = 2L;
         String email = "test@test.com";
-//        InterestInput input = InterestInput.builder()
-//                .tradeId(tradeId)
-//                .email(email)
-//                .build();
 
         given(interestRepository.findByTrade_idAndMember_email(anyLong(), anyString()))
                 .willReturn(Optional.empty());

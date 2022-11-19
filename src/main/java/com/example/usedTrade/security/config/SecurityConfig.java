@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/", "/member/**").permitAll()
-                .antMatchers("/trade/**").authenticated();
+                .antMatchers("/trade/**", "/api/interest/**").authenticated();
 
         http.formLogin()
                 .loginPage("/member/login")
@@ -57,11 +57,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         super.configure(http);
     }
 
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(memberService)
-//                .passwordEncoder(getPasswordEncoder());
-//
-//        super.configure(auth);
-//    }
 }

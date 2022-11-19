@@ -8,7 +8,6 @@ import com.example.usedTrade.trade.model.TradeDto;
 import com.example.usedTrade.trade.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

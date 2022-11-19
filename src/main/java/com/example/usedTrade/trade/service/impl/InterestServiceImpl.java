@@ -5,7 +5,6 @@ import com.example.usedTrade.error.trade.exception.NotInterestedException;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.trade.entity.Interest;
 import com.example.usedTrade.trade.entity.Trade;
-import com.example.usedTrade.trade.model.InterestInput;
 import com.example.usedTrade.trade.repository.InterestRepository;
 import com.example.usedTrade.trade.service.InterestService;
 import lombok.RequiredArgsConstructor;

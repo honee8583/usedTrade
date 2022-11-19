@@ -1,7 +1,5 @@
 package com.example.usedTrade.trade.service;
 
-import com.example.usedTrade.trade.model.InterestInput;
-
 public interface InterestService {
 
     /**
