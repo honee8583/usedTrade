@@ -19,7 +19,7 @@ public class Trade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
