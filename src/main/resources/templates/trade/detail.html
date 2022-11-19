@@ -13,16 +13,83 @@
         .list table tr, .list table td {
             border: solid 1px #000;
         }
+        .interestTrue {
+            color: red;
+        }
+        .interestFalse {
+            color: black;
+        }
     </style>
 
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
             crossorigin="anonymous"></script>
 
-    <script>
+    <script th:inline="javascript">
         $(document).ready(function () {
 
+            var tradeId = [[${tradeDto.id}]];
+            console.log(tradeId);
 
+            // 좋아요 정보 불러오기
+            function getInterest(tradeId) {
+                $.ajax({
+                    url: '/api/interest/' + tradeId,
+                    method: 'get',
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log("get interest info result: " + result);
+
+                        var str = "";
+                        if (result) {
+                            str += "<button id='interestBtn' class='interestTrue' type='button'> 좋아요 </button>";
+                        } else {
+                            str += "<button id='interestBtn' class='interestFalse' type='button'> 좋아요 </button>"
+                        }
+
+                        $("#interestDiv").html(str);
+                    }, error: function(error) {
+                        alert("좋아요 정보를 불러오지 못했습니다\n" + error.message);
+                        console.log(error);
+                    }
+                });
+            }
+
+            getInterest(tradeId);
+
+            // 좋아요 등록
+            $(document).on("click", ".interestFalse", function() {
+
+                $.ajax({
+                    url: '/api/interest/' + tradeId,
+                    method: 'post',
+                    dataType: 'json',
+                    success: function(result) {
+                        alert('좋아요를 등록했습니다.');
+                        getInterest(tradeId);
+                    }, error: function(error) {
+                        alert("좋아요 등록에 실패하였습니다.\n" + error.message);
+                    }
+                });
+
+            });
+
+            // 좋아요 해제
+            $(document).on("click", ".interestTrue", function() {
+
+                $.ajax({
+                    url: '/api/interest/' + tradeId,
+                    method: 'delete',
+                    dataType: 'json',
+                    success: function(result) {
+                        alert('좋아요를 해제했습니다.');
+                        getInterest(tradeId);
+                    }, error: function(error) {
+                        alert("좋아요 해제에 실패하였습니다.\n" + error.message);
+                    }
+                });
+
+            })
 
         });
     </script>
@@ -42,6 +109,9 @@
 
         <div th:each="imgDto: ${tradeDto.tradeImgDtoList}">
             <img th:src="${imgDto.getUrl()}">
+        </div>
+        <div id="interestDiv">
+
         </div>
     </div>
 
