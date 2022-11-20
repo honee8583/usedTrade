@@ -24,11 +24,17 @@
             <div sec:authorize="isAuthenticated()">
                 <p sec:authentication="name"></p>
                 <div sec:authorize="hasRole('ADMIN')">
-                    <a href="/admin/main.do"> 관리자 메뉴 </a>
+                    <a href="/main.do"> 관리자 메뉴 </a>
                 </div>
             </div>
         </div>
         <hr/>
+    </div>
+
+    <div th:fragment="fragment-admin-body-menu">
+        <div>
+            <a href="/keyword/list.do"> 키워드 </a>
+        </div>
     </div>
 
 </body>
