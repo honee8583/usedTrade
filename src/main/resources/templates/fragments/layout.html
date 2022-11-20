@@ -18,13 +18,14 @@
             |
             <a href="/trade/list">게시글</a>
             |
-            <a href="#">신고글</a>
-            |
             <a sec:authorize="isAnonymous()" href="/member/login">로그인</a>
             <a sec:authorize="isAuthenticated()" href="/member/logout">로그아웃</a>
 
             <div sec:authorize="isAuthenticated()">
                 <p sec:authentication="name"></p>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a href="/admin/main.do"> 관리자 메뉴 </a>
+                </div>
             </div>
         </div>
         <hr/>

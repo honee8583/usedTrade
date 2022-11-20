@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UsedTrade</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        #detail {
+            text-align: left;
+        }
+        table th, table td {
+            border: solid 1px #000;
+        }
+    </style>
+</head>
+<body>
+    <h1> 내 게시글 </h1>
+    <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+    <table>
+        <tbody>
+            <tr>
+                <td>
+                    <a href="/member/myPage"> 회원정보 </a>
+                </td>
+                <td rowspan="5">
+                    <div>
+                        <h3>내 게시글</h3>
+                    <!--리스트-->
+                    <table id="detail">
+                        <thead>
+                            <th>NO</th>
+                            <th>제목</th>
+                            <th>가격</th>
+                            <th>키워드</th>
+                            <th>작성자(이메일)</th>
+                            <th>작성일</th>
+                        </thead>
+                        <tbody id="tradeTableBody">
+                            <tr th:each="dto: ${pageResultDTO.dtoList}">
+                                <td>
+                                    <p th:text="${dto.id}">idx</p>
+                                </td>
+                                <td>
+                                    <p>
+                                        <a th:href="@{/trade/detail(tradeId=${dto.id}, page=${pageResultDTO.page},
+                                        type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}" th:text="${dto.title}">
+                                            title
+                                        </a>
+                                    </p>
+                                </td>
+                                <td>
+                                    <p th:text="${dto.price} + 원">price</p>
+                                </td>
+                                <td>
+                                    <p th:text="${dto.keywordList}">keywords</p>
+                                </td>
+                                <td>
+                                    <p th:text="${dto.email}">register email</p>
+                                </td>
+                                <td>
+                                    <p th:text="${#temporals.format(dto.regDt, 'yyyy-MM-dd HH:mm')}">regDt</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+
+                    <a th:if="${pageResultDTO.prev}" th:href="@{/mypage/list(page=${pageResultDTO.start - 1},
+                                type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">
+                        Previous
+                    </a>
+
+                    <th:block th:class="${pageResultDTO.page == page ? 'active' : ''}" th:each="page: ${pageResultDTO.pageList}">
+                        <a th:href="@{/mypage/list/(page=${page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">
+                            [[${page} ]]
+                        </a>
+                    </th:block>
+
+                    <a th:if="${pageResultDTO.next}" th:href="@{/mypage/list(page=${pageResultDTO.end + 1},
+                                type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">
+                        Next
+                    </a>
+
+                </td>
+            </tr>
+            <tr>
+               <td>
+                   <a href="/member/change/password"> 비밀번호 변경 </a>
+               </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/member/withdraw"> 탈퇴 </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/mypage/list"> 내 게시글 </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/mypage/interestList"> 내가 좋아요한 글 </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

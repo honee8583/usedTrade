@@ -77,4 +77,34 @@ class ReplyRepositoryTest {
         // then
         assertEquals(2, replyList.size());
     }
+
+    @Test
+    void testFindByMember_email() {
+        // given
+        Trade savedTrade = tradeRepository.save(Trade.builder().build());
+        Member savedMember = memberRepository.save(Member.builder().email("test").build());
+
+        Reply reply = Reply.builder()
+                .trade(savedTrade)
+                .member(savedMember)
+                .content("content")
+                .regDt(LocalDateTime.now())
+                .build();
+
+        Reply reply2 = Reply.builder()
+                .trade(savedTrade)
+                .member(savedMember)
+                .content("content")
+                .regDt(LocalDateTime.now())
+                .build();
+
+        replyRepository.save(reply);
+        replyRepository.save(reply2);
+
+        // when
+        List<Reply> replyList = replyRepository.findByMember_email(savedMember.getEmail());
+
+        // then
+        assertEquals(2, replyList.size());
+    }
 }

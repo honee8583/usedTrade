@@ -1,6 +1,5 @@
 package com.example.usedTrade.security.config;
 
-
 import com.example.usedTrade.security.service.MemberOAuth2UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.formLogin()
                 .loginPage("/member/login")
-                .failureHandler(getFailureHandler())   // 로그인 실패 케이스
+                .failureHandler(getFailureHandler())
                 .defaultSuccessUrl("/")
                 .permitAll();
 
@@ -51,8 +50,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout()
                 .logoutRequestMatcher(
                         new AntPathRequestMatcher("/member/logout"))
-                .logoutSuccessUrl("/")  // 로그아웃 성공후 이동 페이지
+                .logoutSuccessUrl("/")
                 .invalidateHttpSession(true);   // 세션 초기화
+
+        http.exceptionHandling()
+                .accessDeniedPage("/error/denied");
 
         super.configure(http);
     }

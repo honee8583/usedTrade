@@ -6,6 +6,7 @@ import com.example.usedTrade.member.dto.MemberDto;
 import com.example.usedTrade.member.model.*;
 import com.example.usedTrade.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -19,18 +20,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 import java.security.Principal;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
-    private static final Logger logger =
-            LoggerFactory.getLogger(UsedTradeApplication.class);
-
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
 
     @RequestMapping("/member/login")
     public String login() {
@@ -40,7 +35,6 @@ public class MemberController {
     @GetMapping("/member/register")
     public String register(Model model) {
 
-        logger.info("### MemberController Get member/register ###");
         model.addAttribute("memberInput", new MemberInput());
 
         return "member/register";
@@ -51,7 +45,7 @@ public class MemberController {
                                  @Valid MemberInput memberInput,
                                  BindingResult bindingResult) {
 
-        logger.info("### Register Member Input: " + memberInput);
+        log.info("Member registerSubmit Input: " + memberInput);
 
         if (bindingResult.hasErrors()) {
             return "member/register";
@@ -73,7 +67,7 @@ public class MemberController {
 
     @GetMapping("/member/email-auth")
     public String emailAuth(Model model, String id) {
-        logger.info("### emailAuthUuid: " + id);
+        log.info("Member 이메일 인증 Uuid : " + id);
 
         ServiceResult result = memberService.emailAuth(id);
         model.addAttribute("result", result.isResult());
@@ -87,10 +81,9 @@ public class MemberController {
     @GetMapping("/member/myPage")
     public String myPage(Model model, Principal principal) {
 
-        logger.info("### principal: " + principal.toString());
+        log.info("Member 사용자 정보: " + principal.toString());
 
         MemberDto memberDto = memberService.getInfo(principal.getName());
-        logger.info("### MemberDto : " + memberDto);
         model.addAttribute("memberDto", memberDto);
         model.addAttribute("changeMemberInput", new ChangeMemberInput());
 
@@ -102,12 +95,11 @@ public class MemberController {
                          BindingResult bindingResult,
                          RedirectAttributes redirectAttributes) {
 
-        logger.info("### " + changeMemberInput);
+        log.info("Member 변경할 사용자 정보 input -> " + changeMemberInput);
 
         if (bindingResult.hasErrors()) {
             MemberDto memberDto = memberService.getInfo(changeMemberInput.getEmail());
             model.addAttribute("memberDto", memberDto);
-            logger.info("### MemberDto: " + memberDto);
             return "member/myPage";
         }
 
@@ -128,7 +120,7 @@ public class MemberController {
     @GetMapping("/member/change/password")
     public String changePassword(Model model, Principal principal) {
 
-        logger.info("### logined email: " + principal.getName());
+        log.info("### logined email: " + principal.getName());
         boolean fromSocial = memberService.getFromSocial(principal.getName());
         model.addAttribute("fromSocial", fromSocial);
 
@@ -140,7 +132,7 @@ public class MemberController {
                                        Principal principal,
                                        RedirectAttributes redirectAttributes) {
 
-        logger.info("### ChangePasswordInput: " + passwordInput);
+        log.info("### ChangePasswordInput: " + passwordInput);
         ServiceResult result = memberService.changePassword(principal.getName(), passwordInput);
 
         redirectAttributes.addFlashAttribute("changeResult", result.isResult());
@@ -161,7 +153,7 @@ public class MemberController {
     public String resetPasswordSubmit(Model model, @Valid ResetPasswordInput passwordInput,
                                       BindingResult bindingResult,
                                       RedirectAttributes redirectAttributes) {
-        logger.info("### ResetPasswordInput: " + passwordInput);
+        log.info("### ResetPasswordInput: " + passwordInput);
 
         if (bindingResult.hasErrors()) {
             return "member/reset_password";
@@ -183,7 +175,7 @@ public class MemberController {
 
     @GetMapping("/member/reset/passwordMail")
     public String resetPasswordMail(Model model, String resetPasswordKey) {
-        logger.info("### resetPasswordKey: " + resetPasswordKey);
+        log.info("### resetPasswordKey: " + resetPasswordKey);
 
         ServiceResult result = memberService.checkResetPasswordKey(resetPasswordKey);
 
@@ -201,7 +193,7 @@ public class MemberController {
     public String resetPasswordMailSubmit(Model model,
                                           @Valid ResetPasswordFormInput resetPasswordFormInput,
                                           BindingResult bindingResult) {
-        logger.info("### ResetPasswordFormInput: " + resetPasswordFormInput);
+        log.info("### ResetPasswordFormInput: " + resetPasswordFormInput);
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("result", true);
@@ -225,7 +217,7 @@ public class MemberController {
     @GetMapping("/member/withdraw")
     public String withdraw(Model model, Principal principal) {
 
-        logger.info("### logined email: " + principal.getName());
+        log.info("### logined email: " + principal.getName());
         boolean fromSocial = memberService.getFromSocial(principal.getName());
         model.addAttribute("fromSocial", fromSocial);
 
@@ -234,8 +226,6 @@ public class MemberController {
 
     @PostMapping("/member/withdraw")
     public String withdrawSubmit(Model model, Principal principal, String password) {
-
-        logger.info("### password: " + password);
 
         ServiceResult result = memberService.withdraw(principal.getName(), password);
         if (!result.isResult()) {

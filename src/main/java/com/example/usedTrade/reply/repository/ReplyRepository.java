@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findByTrade_id(long tradeId);
+    List<Reply> findByMember_email(String email);
 }

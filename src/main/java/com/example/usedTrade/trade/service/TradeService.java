@@ -32,4 +32,9 @@ public interface TradeService {
      * 거래글 삭제
      */
     void delete(long tradeId);
+
+    /**
+     * 내가 좋아요한 글 조회
+     */
+    PageResultDTO getMyInterestTradeList(PageRequestDTO pageRequestDTO);
 }

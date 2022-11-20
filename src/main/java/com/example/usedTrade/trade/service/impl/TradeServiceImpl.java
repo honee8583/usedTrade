@@ -7,21 +7,27 @@ import com.example.usedTrade.keyword.repository.KeywordRepository;
 import com.example.usedTrade.member.entity.Member;
 import com.example.usedTrade.page.PageRequestDTO;
 import com.example.usedTrade.page.PageResultDTO;
+import com.example.usedTrade.reply.entity.Reply;
+import com.example.usedTrade.reply.repository.ReplyRepository;
 import com.example.usedTrade.trade.entity.*;
+import com.example.usedTrade.trade.model.InterestDto;
 import com.example.usedTrade.trade.model.TradeDto;
 import com.example.usedTrade.trade.model.TradeImgDto;
+import com.example.usedTrade.trade.repository.InterestRepository;
 import com.example.usedTrade.trade.repository.TradeImageRepository;
 import com.example.usedTrade.trade.repository.TradeRepository;
 import com.example.usedTrade.trade.service.TradeImageService;
 import com.example.usedTrade.trade.service.TradeService;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -37,6 +43,8 @@ public class TradeServiceImpl implements TradeService {
 
     private final TradeRepository tradeRepository;
     private final KeywordRepository keywordRepository;
+    private final ReplyRepository replyRepository;
+    private final InterestRepository interestRepository;
 
     private final TradeImageService tradeImageService;
     private final TradeImageRepository tradeImageRepository;
@@ -136,6 +144,22 @@ public class TradeServiceImpl implements TradeService {
         findTrade(tradeId);
         tradeRepository.deleteById(tradeId);
     }
+
+    @Override
+    public PageResultDTO getMyInterestTradeList(PageRequestDTO pageRequestDTO) {
+        Pageable pageable = pageRequestDTO.getPageable(Sort.by("trade_id").descending());
+
+        Page<Interest> pageList = interestRepository.findAllByMember(
+                Member.builder().email(pageRequestDTO.getKeyword()).build(), pageable);
+
+        Function<Interest, InterestDto> fn = InterestDto::entityToDto;
+
+        PageResultDTO<InterestDto, Interest> pageResultDTO
+                = new PageResultDTO<>(pageList, fn);
+
+        return pageResultDTO;
+    }
+
 
     private Trade findTrade(long tradeId) {
         return tradeRepository.findById(tradeId)
